@@ -18,6 +18,10 @@
     --cat-opt: #2C4A7C;
     --cat-slt: #A23E48;
     --cat-repr: #6B4C9A;
+    --cat-prereq: #7A6A55;
+    --cat-replearn: #2E7D6B;
+    --cat-modeledit: #A8791B;
+    --cat-align: #55618C;
     --radius: 10px;
   }
   @media (prefers-color-scheme: dark) {
@@ -38,6 +42,10 @@
       --cat-opt: #8FB3EC;
       --cat-slt: #E08A92;
       --cat-repr: #B79BE0;
+      --cat-prereq: #B9A98C;
+      --cat-replearn: #7ECBB5;
+      --cat-modeledit: #E0B85E;
+      --cat-align: #A9B3D9;
     }
   }
   :root[data-theme="dark"] {
@@ -57,6 +65,10 @@
     --cat-opt: #8FB3EC;
     --cat-slt: #E08A92;
     --cat-repr: #B79BE0;
+    --cat-prereq: #B9A98C;
+    --cat-replearn: #7ECBB5;
+    --cat-modeledit: #E0B85E;
+    --cat-align: #A9B3D9;
   }
 
   * { box-sizing: border-box; }
@@ -185,6 +197,25 @@
   .post-body { line-height: 1.85; font-size: 1.05rem; }
   .post-body p { margin: 0 0 18px; }
   .post-body .mjx-container { margin: 4px 0; }
+  .post-body figure { margin: 8px 0 28px; }
+  .viz { width: 100%; height: auto; display: block; }
+  .viz-box { fill: var(--paper); stroke: var(--line-strong); stroke-width: 1.3px; }
+  .viz-box-accent { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.3px; }
+  .viz-box-warm { fill: var(--accent-warm-soft); stroke: var(--accent-warm); stroke-width: 1.3px; }
+  .viz-box-grey { fill: var(--line); stroke: var(--line-strong); stroke-width: 1px; }
+  .viz-line { stroke: var(--ink-soft); stroke-width: 1.5px; fill: none; }
+  .viz-line-dash { stroke: var(--ink-soft); stroke-width: 1.5px; fill: none; stroke-dasharray: 4 4; }
+  .viz-line-accent { stroke: var(--accent); stroke-width: 2px; fill: none; }
+  .viz-line-warm { stroke: var(--accent-warm); stroke-width: 2px; fill: none; }
+  .viz-line-repr { stroke: var(--cat-repr); stroke-width: 2px; fill: none; }
+  .viz-line-slt { stroke: var(--cat-slt); stroke-width: 2px; fill: none; }
+  .viz-fill-accent { fill: var(--accent); }
+  .viz-fill-warm { fill: var(--accent-warm); }
+  .viz-fill-repr { fill: var(--cat-repr); }
+  .viz-fill-slt { fill: var(--cat-slt); }
+  .viz-text { font-family: "IBM Plex Mono", monospace; font-size: 11px; fill: var(--ink-soft); }
+  .viz-text-strong { font-family: "IBM Plex Mono", monospace; font-size: 12px; fill: var(--ink); font-weight: 500; }
+  .viz-caption { font-family: "Source Serif 4", serif; font-style: italic; font-size: 12.5px; fill: var(--ink-faint); }
 
   /* ---- papers ---- */
   .papers-toolbar {
@@ -201,7 +232,7 @@
   .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
   .graph-wrap {
     position: relative; border: 1px solid var(--line); border-radius: var(--radius);
-    background: var(--paper-raised); height: 560px; overflow: hidden;
+    background: var(--paper-raised); height: 660px; overflow: hidden;
   }
   #graph-svg { width: 100%; height: 100%; cursor: grab; }
   #graph-svg:active { cursor: grabbing; }
@@ -259,7 +290,7 @@
 </style>
 
 <div id="sample-banner">
-  <span>📝 <strong>Profile and CV are real</strong> — the Math Blog and Paper Archive below are still sample content so you can see how the features work. Send a real post or paper link to replace them.</span>
+  <span>📝 <strong>Everything below is real</strong> — profile, CV, the paper archive (a real reading list), and blog posts working through the math behind each cluster of papers.</span>
   <button id="banner-dismiss" type="button">Dismiss</button>
 </div>
 
@@ -311,8 +342,8 @@
     <section class="view" id="view-papers">
       <p class="eyebrow">Paper Archive</p>
       <h1 style="margin:0 0 8px;">Citation Graph</h1>
-      <p class="tagline" style="margin-bottom:4px;">Every reviewed paper as a node; an edge means one paper cites another that's also in the archive. Click a node for the full review.</p>
-      <p class="placeholder-note" style="margin-bottom:24px;">Sample seed set below: real papers in mechanistic interpretability, activation steering, and representation engineering — citation edges are illustrative for this demo, not checked against the actual reference lists. Send a paper link to replace this set with your real archive.</p>
+      <p class="tagline" style="margin-bottom:4px;">My mechanistic-interpretability reading list, plotted as a citation graph. An edge means one paper cites (or directly builds on) another that's also in the archive. Click a node for the full review.</p>
+      <p class="placeholder-note" style="margin-bottom:24px;">Citation edges reflect intellectual lineage as I understand it, not a verified check against each paper's actual reference list.</p>
       <div class="papers-toolbar">
         <input id="paper-search" type="search" placeholder="Search title or author…">
         <div class="legend" id="paper-legend"></div>
@@ -415,42 +446,176 @@
 
     posts: [
       {
-        id: "spectral-theorem",
-        title: "Why the Spectral Theorem Still Surprises Me",
-        date: "2026-03-02",
-        tags: ["Linear Algebra"],
-        excerpt: "Every normal operator on a finite-dimensional inner product space diagonalizes in an orthonormal basis — a one-line statement that took me a full afternoon to actually believe.",
+        id: "residual-stream",
+        title: "The Residual Stream: Reading a Transformer Layer as Addition",
+        date: "2026-09-10",
+        tags: ["Transformer Circuits", "Linear Algebra"],
+        excerpt: "Working through Attention Is All You Need and A Mathematical Framework for Transformer Circuits by rebuilding one layer as pure addition — the idea the rest of this reading list depends on.",
         body:
-          "<p>The statement is short: if $T$ is a normal operator on a finite-dimensional complex inner product space ($TT^* = T^*T$), then there is an orthonormal basis of eigenvectors, and</p>" +
-          "<p>$$ T = \\sum_{i=1}^n \\lambda_i \\, \\langle \\cdot, e_i \\rangle \\, e_i $$</p>" +
-          "<p>where $\\{e_i\\}$ is that orthonormal basis and $\\lambda_i$ the corresponding eigenvalues. What surprised me on a second read wasn't the result — it's that normality is exactly the condition that makes $T$ and $T^*$ share eigenvectors. Once you see $\\|Tv\\| = \\|T^*v\\|$ falling straight out of $\\langle Tv, Tv\\rangle = \\langle T^*Tv, v\\rangle = \\langle TT^*v, v\\rangle = \\langle T^*v, T^*v\\rangle$, the rest of the proof (induction on dimension, peel off one eigenvector, restrict to the orthogonal complement) writes itself.</p>" +
-          "<p>The part worth remembering for prelims: self-adjoint and unitary operators are both normal, so this one theorem quietly contains two of the results I used to memorize separately.</p>"
+          "<p>Prerequisite reading for the rest of this list: <em>Attention Is All You Need</em>, then Elhage et al.'s <em>A Mathematical Framework for Transformer Circuits</em>. The second paper only clicked for me once I stopped picturing a transformer as a stack of layers and started picturing it as one stream of vectors that layers write into.</p>" +
+          "<p>Concretely: let $x_l \\in \\mathbb{R}^d$ be the residual stream entering layer $l$. Attention and the MLP each read $x_l$, compute something, and add their output back in:</p>" +
+          "<p>$$ x_{l+1} = x_l + \\text{Attn}(x_l) + \\text{MLP}(x_l) $$</p>" +
+          "<p>Nothing is overwritten. Every earlier layer's contribution is still sitting inside $x_{l+1}$, linearly, waiting to be read by a later layer or by the unembedding at the very end. That's the whole trick behind circuit analysis: because the stream is additive, the final output decomposes into a sum of terms, one per attention head and MLP, and you can ask which terms actually matter for a given behavior.</p>" +
+          "<figure><svg viewBox='0 0 640 200' class='viz' role='img' aria-label='Diagram of the residual stream with an attention block and an MLP block each adding their output back into it'>" +
+          "<line x1='30' y1='150' x2='610' y2='150' class='viz-line-accent'/>" +
+          "<polygon points='610,150 596,144 596,156' class='viz-fill-accent'/>" +
+          "<text x='30' y='175' class='viz-text'>x_l</text>" +
+          "<text x='560' y='175' class='viz-text'>x_(l+1)</text>" +
+          "<rect x='130' y='35' width='140' height='50' rx='6' class='viz-box-accent'/>" +
+          "<text x='200' y='65' text-anchor='middle' class='viz-text-strong'>Attention</text>" +
+          "<line x1='200' y1='85' x2='200' y2='150' class='viz-line'/>" +
+          "<polygon points='200,150 193,136 207,136' class='viz-fill-warm'/>" +
+          "<rect x='350' y='35' width='110' height='50' rx='6' class='viz-box-warm'/>" +
+          "<text x='405' y='65' text-anchor='middle' class='viz-text-strong'>MLP</text>" +
+          "<line x1='405' y1='85' x2='405' y2='150' class='viz-line'/>" +
+          "<polygon points='405,150 398,136 412,136' class='viz-fill-warm'/>" +
+          "<text x='320' y='192' text-anchor='middle' class='viz-caption'>each sublayer reads the stream, computes something, and adds its output back in — nothing is overwritten</text>" +
+          "</svg></figure>" +
+          "<p>Attention splits further into a QK circuit that decides <em>where</em> to attend (a bilinear function of two positions) and an OV circuit that decides <em>what</em> gets written once a source token is chosen. Multi-head attention is just several small QK/OV pairs, each reading and writing the same shared stream independently. Once that's internalized, induction heads — the next post — stop looking like magic and start looking like two of these circuits composed in sequence.</p>"
       },
       {
-        id: "measure-theoretic-probability",
-        title: "A First Pass at Measure-Theoretic Probability",
-        date: "2026-02-14",
-        tags: ["Probability", "Analysis"],
-        excerpt: "Rebuilding expectation as a Lebesgue integral over a probability space, and why the extra rigor over an undergrad course actually buys something.",
+        id: "induction-heads",
+        title: "Induction Heads: The Simplest Circuit That Does In-Context Learning",
+        date: "2026-09-13",
+        tags: ["Transformer Circuits", "In-Context Learning"],
+        excerpt: "How a two-head circuit completes [A][B] … [A] → [B], and why Olsson et al. think it's the mechanistic seed of in-context learning at every model scale.",
         body:
-          "<p>A probability space is a measure space $(\\Omega, \\mathcal{F}, \\mathbb{P})$ with $\\mathbb{P}(\\Omega) = 1$, and a random variable is just an $\\mathcal{F}$-measurable function $X : \\Omega \\to \\mathbb{R}$. Expectation is then nothing exotic:</p>" +
-          "<p>$$ \\mathbb{E}[X] = \\int_\\Omega X \\, d\\mathbb{P} $$</p>" +
-          "<p>What the undergraduate \"sum $p_i x_i$ or integrate $x f(x)\\,dx$\" definitions hide is that they're both this same Lebesgue integral, specialized to a discrete or absolutely-continuous $\\mathbb{P}$. The measure-theoretic version is the one that survives contact with random variables that are neither — mixtures, stopped processes, limits of the two.</p>" +
-          "<p>The payoff I didn't expect: once expectation is an integral, the convergence theorems (monotone, dominated) become the actual engine behind \"can I swap a limit and an expectation,\" which shows up constantly once you get to martingales.</p>"
+          "<p>Take the sequence <code>… A B … A</code> and ask a language model what comes next. If it's seen the pattern <code>A → B</code> earlier in the same context, the obvious guess is <code>B</code> — and there turns out to be a remarkably literal mechanism behind that guess.</p>" +
+          "<figure><svg viewBox='0 0 640 190' class='viz' role='img' aria-label='Diagram of an induction head completing the pattern A B C A by predicting B'>" +
+          "<rect x='30' y='60' width='70' height='50' rx='6' class='viz-box'/><text x='65' y='90' text-anchor='middle' class='viz-text-strong'>A</text>" +
+          "<rect x='120' y='60' width='70' height='50' rx='6' class='viz-box'/><text x='155' y='90' text-anchor='middle' class='viz-text-strong'>B</text>" +
+          "<rect x='210' y='60' width='70' height='50' rx='6' class='viz-box'/><text x='245' y='90' text-anchor='middle' class='viz-text-strong'>C</text>" +
+          "<rect x='300' y='60' width='70' height='50' rx='6' class='viz-box-accent'/><text x='335' y='90' text-anchor='middle' class='viz-text-strong'>A</text>" +
+          "<text x='410' y='92' text-anchor='middle' class='viz-text-strong'>→</text>" +
+          "<rect x='450' y='60' width='70' height='50' rx='6' class='viz-box-warm' stroke-dasharray='5 4'/><text x='485' y='90' text-anchor='middle' class='viz-text-strong'>B?</text>" +
+          "<path d='M335,55 Q245,10 155,55' class='viz-line-dash'/>" +
+          "<text x='245' y='28' text-anchor='middle' class='viz-caption'>attends back to the token after the last A</text>" +
+          "<line x1='158' y1='112' x2='468' y2='142' class='viz-line-accent'/>" +
+          "<polygon points='468,142 452,138 456,150' class='viz-fill-accent'/>" +
+          "<text x='330' y='168' text-anchor='middle' class='viz-caption'>…then copies that token forward as the prediction</text>" +
+          "</svg></figure>" +
+          "<p>An <strong>induction head</strong> implements this in two steps, using two attention heads in sequence. A <em>previous-token head</em> in an earlier layer writes \"the token before me was A\" into the residual stream at each position. Then, at the current (second) A, the induction head attends back to whichever position carries that tag — landing on the first B — and copies B's identity forward into its output.</p>" +
+          "<p>What makes Olsson et al.'s case convincing isn't the mechanism alone, it's six mostly-independent pieces of evidence — attention-pattern analysis, ablations, per-token loss curves, synthetic in-context tasks — that all point at the same conclusion: induction heads form at almost exactly the training step where a sharp bump in in-context learning ability appears, across model sizes. That correlation, argued from six directions at once, is what turns \"we found an interesting attention pattern\" into \"this circuit is doing real work.\"</p>" +
+          "<p>The object underneath is nothing more exotic than a composition of two linear maps (the OV circuits of the two heads), gated by two attention patterns (their QK circuits) — exactly the vocabulary the circuits framework sets up. A small, concrete existence proof that the residual-stream decomposition from the last post is precise enough to find and name an actual algorithm inside the weights.</p>"
+      },
+      {
+        id: "superposition-sae",
+        title: "Neuron ≠ Concept: Superposition and Sparse Autoencoders",
+        date: "2026-09-16",
+        tags: ["Sparse Autoencoders", "Linear Algebra"],
+        excerpt: "Working through why individual neurons are so often polysemantic, and how a sparse autoencoder unfolds a small activation space into a wider, mostly-legible one.",
+        body:
+          "<p>Ask what a single neuron in an MLP layer \"means\" and you usually get an unsatisfying answer: it fires a little for French text, a little for legal boilerplate, and a little for a specific kind of parenthetical aside. That's polysemanticity, and the leading explanation is <strong>superposition</strong>: with $d$ neurons, a model can represent far more than $d$ features, as long as those features are individually sparse — rarely all active at once — and the model is willing to pack them into <em>non-orthogonal</em> directions.</p>" +
+          "<p>The intuition, formalized across the papers below: if features $f_1, \\dots, f_n$ are represented as directions $w_1, \\dots, w_n \\in \\mathbb{R}^d$ with $n \\gg d$, exact orthogonality is impossible, but near-orthogonality is enough when features rarely co-occur — the interference term $\\langle w_i, w_j \\rangle$ only costs the model when $f_i$ and $f_j$ are active on the same input.</p>" +
+          "<figure><svg viewBox='0 0 640 270' class='viz' role='img' aria-label='Diagram comparing overlapping neuron directions under superposition with the wider sparse feature basis a sparse autoencoder recovers'>" +
+          "<rect x='20' y='20' width='280' height='200' rx='6' class='viz-box'/>" +
+          "<line x1='160' y1='200' x2='100' y2='70' class='viz-line-accent'/><polygon points='100,70 110,82 93,80' class='viz-fill-accent'/>" +
+          "<line x1='160' y1='200' x2='235' y2='55' class='viz-line-warm'/><polygon points='235,55 226,68 243,65' class='viz-fill-warm'/>" +
+          "<line x1='160' y1='200' x2='150' y2='45' class='viz-line-repr'/><polygon points='150,45 158,58 142,56' class='viz-fill-repr'/>" +
+          "<line x1='160' y1='200' x2='245' y2='120' class='viz-line-slt'/><polygon points='245,120 234,127 236,110' class='viz-fill-slt'/>" +
+          "<text x='160' y='245' text-anchor='middle' class='viz-caption'>a few neurons, many overlapping feature directions</text>" +
+          "<rect x='340' y='20' width='280' height='200' rx='6' class='viz-box'/>" +
+          "<rect x='356' y='36' width='34' height='34' class='viz-box-grey'/><rect x='398' y='36' width='34' height='34' class='viz-fill-accent'/><rect x='440' y='36' width='34' height='34' class='viz-box-grey'/><rect x='482' y='36' width='34' height='34' class='viz-box-grey'/><rect x='524' y='36' width='34' height='34' class='viz-box-grey'/><rect x='566' y='36' width='34' height='34' class='viz-box-grey'/>" +
+          "<rect x='356' y='78' width='34' height='34' class='viz-box-grey'/><rect x='398' y='78' width='34' height='34' class='viz-box-grey'/><rect x='440' y='78' width='34' height='34' class='viz-box-grey'/><rect x='482' y='78' width='34' height='34' class='viz-fill-warm'/><rect x='524' y='78' width='34' height='34' class='viz-box-grey'/><rect x='566' y='78' width='34' height='34' class='viz-box-grey'/>" +
+          "<rect x='356' y='120' width='34' height='34' class='viz-box-grey'/><rect x='398' y='120' width='34' height='34' class='viz-box-grey'/><rect x='440' y='120' width='34' height='34' class='viz-box-grey'/><rect x='482' y='120' width='34' height='34' class='viz-box-grey'/><rect x='524' y='120' width='34' height='34' class='viz-box-grey'/><rect x='566' y='120' width='34' height='34' class='viz-fill-repr'/>" +
+          "<rect x='356' y='162' width='34' height='34' class='viz-box-grey'/><rect x='398' y='162' width='34' height='34' class='viz-box-grey'/><rect x='440' y='162' width='34' height='34' class='viz-box-grey'/><rect x='482' y='162' width='34' height='34' class='viz-box-grey'/><rect x='524' y='162' width='34' height='34' class='viz-box-grey'/><rect x='566' y='162' width='34' height='34' class='viz-box-grey'/>" +
+          "<text x='480' y='245' text-anchor='middle' class='viz-caption'>a wider, sparse basis — most features off, a few legible ones on</text>" +
+          "</svg></figure>" +
+          "<p>A <strong>sparse autoencoder</strong> tries to reverse this. Given an activation $x$, learn an encoder into a much wider space, $z = \\text{ReLU}(W_{\\text{enc}} x + b_{\\text{enc}})$ with $\\dim(z) \\gg \\dim(x)$, a decoder $\\hat{x} = W_{\\text{dec}} z + b_{\\text{dec}}$, and train with reconstruction loss plus an $L_1$ penalty on $z$:</p>" +
+          "<p>$$ \\mathcal{L} = \\lVert x - \\hat{x} \\rVert_2^2 + \\lambda \\lVert z \\rVert_1 $$</p>" +
+          "<p>The $L_1$ term does the work: it pushes almost every entry of $z$ to exactly zero for any given input, so each activation only \"lights up\" a handful of the many available feature directions. Cunningham et al. and Bricken et al. both find these directions score dramatically more monosemantic than the original neurons — and Templeton et al.'s follow-up shows the same recipe keeps working at Claude 3 Sonnet scale, turning up millions of features including clearly abstract, multilingual, and multimodal ones. That scaling result is the reason SAEs are the part of this list I'm most eager to actually run experiments on.</p>"
+      },
+      {
+        id: "activation-steering",
+        title: "Steering by Addition: What h + v Actually Buys You",
+        date: "2026-09-19",
+        tags: ["Activation Steering", "Representation Engineering"],
+        excerpt: "Reading Turner et al., Zou et al., and the new steering-vector-distillation paper together — the geometry behind changing a model's behavior without touching its weights.",
+        body:
+          "<p>The activation-steering recipe, stripped to its simplest form: take two sets of prompts that differ mainly in one concept — polite vs. rude, honest vs. deceptive, cautious vs. reckless — run them through the model, average the residual-stream activations at some layer for each set, and subtract:</p>" +
+          "<p>$$ v = \\bar h_{\\text{concept}} - \\bar h_{\\text{contrast}} $$</p>" +
+          "<p>Then, at inference time on a <em>new</em> prompt, add $\\alpha v$ into the residual stream at that layer, for some scale $\\alpha$: $h \\to h + \\alpha v$. No gradient step, no fine-tuning — arithmetic on activations, done once per generation.</p>" +
+          "<figure><svg viewBox='0 0 640 260' class='viz' role='img' aria-label='Diagram of a steering vector as the difference between two activation cluster centroids, added to a new point'>" +
+          "<rect x='10' y='10' width='620' height='240' rx='6' class='viz-box'/>" +
+          "<circle cx='140' cy='175' r='4' class='viz-fill-slt'/><circle cx='165' cy='200' r='4' class='viz-fill-slt'/><circle cx='150' cy='210' r='4' class='viz-fill-slt'/><circle cx='180' cy='185' r='4' class='viz-fill-slt'/><circle cx='160' cy='190' r='6' class='viz-fill-slt'/>" +
+          "<text x='160' y='232' text-anchor='middle' class='viz-text'>\"rude\" activations</text>" +
+          "<circle cx='440' cy='65' r='4' class='viz-fill-accent'/><circle cx='470' cy='90' r='4' class='viz-fill-accent'/><circle cx='450' cy='95' r='4' class='viz-fill-accent'/><circle cx='480' cy='70' r='4' class='viz-fill-accent'/><circle cx='460' cy='80' r='6' class='viz-fill-accent'/>" +
+          "<text x='460' y='40' text-anchor='middle' class='viz-text'>\"polite\" activations</text>" +
+          "<line x1='160' y1='190' x2='460' y2='80' class='viz-line-warm'/><polygon points='460,80 442,86 449,68' class='viz-fill-warm'/>" +
+          "<text x='330' y='118' text-anchor='middle' class='viz-caption'>v = mean(polite) − mean(rude)</text>" +
+          "<circle cx='300' cy='220' r='5' class='viz-fill-repr'/><text x='300' y='245' text-anchor='middle' class='viz-text-strong'>h</text>" +
+          "<line x1='300' y1='220' x2='600' y2='110' class='viz-line-dash'/>" +
+          "<circle cx='600' cy='110' r='5' class='viz-fill-repr'/><text x='598' y='130' text-anchor='middle' class='viz-text-strong'>h + v</text>" +
+          "</svg></figure>" +
+          "<p>Turner et al.'s <em>Activation Addition</em> is the clean, minimal version of this. Zou et al.'s <em>Representation Engineering</em> generalizes it into a two-way tool: the same direction $v$ that steers behavior when added can also be used as a monitor when read — project a live activation onto $v$ and get a live estimate of how \"honest\" or \"power-seeking\" the model's internal state currently is, without generating a single token. Behavior, representation, control, as one loop instead of three separate problems.</p>" +
+          "<p>The paper I'm reading most closely right now, <em>Subliminal Learning Is Steering Vector Distillation</em>, uses this same $v$ to explain something that looks unrelated at first glance: why fine-tuning a student model on a teacher's outputs can transmit a trait the teacher never states outright. Their finding is that this only happens when the teacher's behavior is itself well-approximated by a steering vector — subliminal transmission has a necessary-and-sufficient condition, and it's exactly the geometric object this whole post has been about.</p>"
+      },
+      {
+        id: "low-dim-adaptation",
+        title: "Low-Dimensional Learning: From Intrinsic Dimensionality to Task Arithmetic",
+        date: "2026-09-22",
+        tags: ["Representation Learning", "Optimization"],
+        excerpt: "Why fine-tuning barely needs any dimensions at all, and how that fact turns into arithmetic on model weights.",
+        body:
+          "<p>Aghajanyan et al. ask a specific, almost mechanical question: if you constrain a fine-tuning update to a random low-dimensional subspace of the full parameter space — literally project the update through a fixed random matrix into $\\mathbb{R}^k$ for small $k$ — how small can $k$ get before performance falls off a cliff? Their answer, the \"intrinsic dimension,\" is surprisingly small for pretrained models, and shrinks further as pretraining scale increases.</p>" +
+          "<figure><svg viewBox='0 0 640 260' class='viz' role='img' aria-label='Diagram of a low-dimensional subspace inside the full parameter space, with two task vectors adding inside it'>" +
+          "<rect x='15' y='15' width='610' height='230' rx='6' class='viz-box'/>" +
+          "<text x='30' y='35' class='viz-text'>full parameter space</text>" +
+          "<ellipse cx='330' cy='155' rx='230' ry='75' transform='rotate(-12 330 155)' class='viz-box-accent'/>" +
+          "<text x='330' y='92' text-anchor='middle' class='viz-text'>low-dimensional adaptation subspace</text>" +
+          "<circle cx='230' cy='178' r='4' class='viz-fill-warm'/><text x='222' y='202' text-anchor='middle' class='viz-text'>base</text>" +
+          "<line x1='230' y1='178' x2='360' y2='122' class='viz-line-accent'/><polygon points='360,122 342,126 350,109' class='viz-fill-accent'/>" +
+          "<text x='330' y='107' text-anchor='middle' class='viz-caption'>task_A</text>" +
+          "<line x1='360' y1='122' x2='470' y2='157' class='viz-line-warm'/><polygon points='470,157 452,153 458,170' class='viz-fill-warm'/>" +
+          "<text x='440' y='182' text-anchor='middle' class='viz-caption'>task_B</text>" +
+          "<line x1='230' y1='178' x2='470' y2='157' class='viz-line-dash'/>" +
+          "<text x='470' y='142' text-anchor='middle' class='viz-text-strong'>base + A + B</text>" +
+          "</svg></figure>" +
+          "<p>Read that as a geometric claim: somewhere inside a billion-parameter space, the set of directions a fine-tuning run actually needs is a thin, low-dimensional slice. Ilharco et al.'s <em>task arithmetic</em> takes that slice seriously as an object you can compute with. Define a <strong>task vector</strong> as the difference between a fine-tuned checkpoint $\\theta_{\\text{task}}$ and the pretrained weights it started from, $\\tau = \\theta_{\\text{task}} - \\theta_{\\text{pre}}$, and the central result is that these vectors compose almost linearly:</p>" +
+          "<p>$$ \\theta_{\\text{pre}} + \\tau_A + \\tau_B \\ \\text{installs both tasks;} \\quad \\theta_{\\text{pre}} - \\tau_A \\ \\text{removes task A} $$</p>" +
+          "<p>That's activation steering's difference-of-means trick, run one level up — on weights instead of activations, over an entire fine-tuning run instead of a batch of contrastive prompts. It's the paper on this list that makes me most want to check whether the two are secretly the same phenomenon at different scales, or genuinely distinct mechanisms that happen to share an equation.</p>"
+      },
+      {
+        id: "editing-vs-steering",
+        title: "Editing One Fact vs Steering a Behavior: ROME, MEMIT, and Permanence",
+        date: "2026-09-24",
+        tags: ["Model Editing", "Alignment"],
+        excerpt: "ROME and MEMIT change the weights; activation steering changes nothing. Working through what that distinction actually costs and buys.",
+        body:
+          "<p>ROME starts from a diagnostic: causal tracing. Corrupt the input embedding of a subject token (\"The Eiffel Tower\"), restore the model's internal activations one at a time at different layer/token positions, and see which restorations bring back the correct completion (\"… is in Paris\"). Meng et al. find the effect concentrates sharply in a narrow band of MLP layers at the subject's last token — evidence that this particular fact is retrieved from a fairly localized place.</p>" +
+          "<p>Having localized it, ROME treats that MLP as an associative memory: an input key $k$ (roughly, a representation of \"Eiffel Tower\") maps through the layer to an output value $v$ (roughly, \"Paris\"). It then computes a minimal, rank-one change to the MLP's weight matrix $W$ that swaps in a new value for that one key while disturbing other keys as little as possible — solved as a constrained least-squares problem, not a training run.</p>" +
+          "<figure><svg viewBox='0 0 640 240' class='viz' role='img' aria-label='Diagram contrasting a permanent weight edit with a temporary activation steering intervention'>" +
+          "<rect x='20' y='20' width='280' height='200' rx='6' class='viz-box'/>" +
+          "<text x='160' y='45' text-anchor='middle' class='viz-text-strong'>weight edit (ROME / MEMIT)</text>" +
+          "<rect x='60' y='65' width='200' height='28' class='viz-box-grey'/>" +
+          "<rect x='60' y='98' width='200' height='28' class='viz-box-grey'/>" +
+          "<rect x='60' y='131' width='200' height='28' class='viz-box-warm'/>" +
+          "<text x='160' y='150' text-anchor='middle' class='viz-text-strong'>key → new value</text>" +
+          "<rect x='60' y='164' width='200' height='28' class='viz-box-grey'/>" +
+          "<text x='160' y='215' text-anchor='middle' class='viz-caption'>one row overwritten — persists on every future forward pass</text>" +
+          "<rect x='340' y='20' width='280' height='200' rx='6' class='viz-box'/>" +
+          "<text x='480' y='45' text-anchor='middle' class='viz-text-strong'>activation steering</text>" +
+          "<line x1='360' y1='140' x2='600' y2='140' class='viz-line-accent'/><polygon points='600,140 588,134 588,146' class='viz-fill-accent'/>" +
+          "<line x1='480' y1='140' x2='480' y2='95' class='viz-line-dash'/><polygon points='480,95 474,107 486,107' class='viz-fill-repr'/>" +
+          "<text x='480' y='85' text-anchor='middle' class='viz-caption'>+ v, added only during this pass</text>" +
+          "<text x='480' y='215' text-anchor='middle' class='viz-caption'>weights untouched — revert by simply not adding v</text>" +
+          "</svg></figure>" +
+          "<p>MEMIT is the scale-up: instead of one edit concentrated in one layer, it spreads many simultaneous edits across a range of layers, which turns out to matter for keeping thousands of edits from interfering with each other.</p>" +
+          "<p>Set next to activation steering, the contrast is exactly where the interesting questions live. A weight edit changes $\\theta$ itself — permanent, present on every future forward pass, invisible unless you go looking for it. A steering vector changes one forward pass's activations — reversible by construction, legible as long as you know what direction was added. For anything safety-relevant, that gap in permanence and visibility isn't incidental — it's most of the reason interpretability researchers reach for steering, and for reading representations, before reaching for surgery on the weights.</p>"
       }
     ],
 
     papers: [
       {
-        id: "circuits-2020",
-        title: "Zoom In: An Introduction to Circuits",
-        authors: "C. Olah, N. Cammarata, L. Schubert, et al.",
-        year: 2020,
-        venue: "Distill",
-        source: "https://distill.pub/2020/circuits/zoom-in/",
-        tag: "interp",
+        id: "attention-2017",
+        title: "Attention Is All You Need",
+        authors: "A. Vaswani, N. Shazeer, N. Parmar, et al.",
+        year: 2017,
+        venue: "NeurIPS",
+        source: "https://arxiv.org/abs/1706.03762",
+        tag: "prereq",
         cites: [],
-        review: "The manifesto for treating networks as programs to reverse-engineer: features as the fundamental unit, circuits as the connections between them. The three claims (features, circuits, universality) still frame how I read every interpretability paper that came after it."
+        review: "The paper that made recurrence optional: replace it entirely with self-attention and the model still learns long-range dependencies, in parallel, in a fraction of the training time. Sections 2-3 are the ones worth reading closely — scaled dot-product attention and multi-head attention, $\\text{Attention}(Q,K,V) = \\text{softmax}\\!\\left(\\frac{QK^\\top}{\\sqrt{d_k}}\\right)V$. Everything in the circuits literature below is this equation, taken apart."
       },
       {
         id: "transformer-circuits-2021",
@@ -460,19 +625,19 @@
         venue: "Transformer Circuits Thread (Anthropic)",
         source: "https://transformer-circuits.pub/2021/framework/index.html",
         tag: "interp",
-        cites: ["circuits-2020"],
-        review: "Rewrites attention-only transformers as compositions of linear maps you can actually trace — QK and OV circuits, induction heads. The residual stream is additive across layers, so the whole forward pass decomposes into interpretable terms instead of one opaque function."
+        cites: ["attention-2017"],
+        review: "Rewrites attention-only transformers as compositions of linear maps you can actually trace — the residual stream, QK and OV circuits, path expansion. The idea that makes the rest of the field legible: the residual stream is additive across layers, so the whole forward pass decomposes into interpretable terms instead of one opaque function. Read slowly; this is the vocabulary everything else below is written in."
       },
       {
-        id: "superposition-2022",
-        title: "Toy Models of Superposition",
-        authors: "N. Elhage, T. Hume, C. Olah, et al.",
+        id: "induction-heads-2022",
+        title: "In-context Learning and Induction Heads",
+        authors: "C. Olsson, N. Elhage, N. Nanda, et al.",
         year: 2022,
         venue: "Transformer Circuits Thread (Anthropic)",
-        source: "https://transformer-circuits.pub/2022/toy_model/index.html",
+        source: "https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html",
         tag: "interp",
         cites: ["transformer-circuits-2021"],
-        review: "The uncomfortable idea that a model can represent more features than it has neurons by packing them into overlapping, non-orthogonal directions when features are sparse. Explains why neurons are so often polysemantic and motivates most of what came after in feature disentanglement, sparse autoencoders included."
+        review: "Finds a two-head circuit that completes patterns like [A][B] … [A] → [B] by attending back to whatever token followed the last occurrence of the current one, then copying it forward. Six independent lines of evidence all point at induction heads forming at precisely the training step where in-context learning ability jumps — this is the paper where mechanistic interpretability started feeling like a real field to me, not just close reading of toy models."
       },
       {
         id: "grokking-2023",
@@ -483,7 +648,40 @@
         source: "https://arxiv.org/abs/2301.05217",
         tag: "interp",
         cites: ["transformer-circuits-2021"],
-        review: "Reverse-engineers a one-layer transformer trained on modular addition and finds it implements a Fourier-based algorithm — trig identities standing in for arithmetic. The reusable part isn't the algorithm, it's the method: progress measures that predict the grokking phase transition before test accuracy ever moves."
+        review: "Reverse-engineers a one-layer transformer trained on modular addition and finds it implements a Fourier-based algorithm — trig identities standing in for arithmetic. The reusable part isn't the algorithm, it's the method: progress measures that predict the grokking phase transition before test accuracy ever moves. Closest paper on this list to my own interests — it's a direct case study in how representations evolve during learning."
+      },
+      {
+        id: "sae-interpretable-2023",
+        title: "Sparse Autoencoders Find Highly Interpretable Features in Language Models",
+        authors: "H. Cunningham, A. Ewart, L. Riggs, R. Huben, L. Sharkey",
+        year: 2023,
+        venue: "arXiv",
+        source: "https://arxiv.org/abs/2309.08600",
+        tag: "sae",
+        cites: ["transformer-circuits-2021"],
+        review: "Trains a sparse autoencoder on MLP activations to decompose them into an overcomplete, mostly-inactive basis of directions, and shows the resulting features score far more monosemantic than raw neurons, by both human and automatic evaluation. The mechanism worth understanding for its own sake: an $L_1$ penalty on the hidden activations pushes the autoencoder toward exactly the sparse, high-dimensional basis the superposition hypothesis predicts should exist."
+      },
+      {
+        id: "monosemanticity-2023",
+        title: "Towards Monosemanticity: Decomposing Language Models With Dictionary Learning",
+        authors: "T. Bricken, A. Templeton, J. Batson, et al.",
+        year: 2023,
+        venue: "Transformer Circuits Thread (Anthropic)",
+        source: "https://transformer-circuits.pub/2023/monosemantic-features",
+        tag: "sae",
+        cites: ["sae-interpretable-2023"],
+        review: "The larger-scale demonstration, concurrent with Cunningham et al., that a single neuron routinely fires for a tangle of unrelated concepts while the sparse-autoencoder features extracted from that same layer each correspond to one legible thing — a specific script, a base64 string, a request for advice. The line I keep coming back to: neuron ≠ concept; the feature is the more fundamental unit, and it's usually not aligned to any single neuron's axis."
+      },
+      {
+        id: "scaling-mono-2024",
+        title: "Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet",
+        authors: "A. Templeton, T. Conerly, J. Marcus, et al.",
+        year: 2024,
+        venue: "Transformer Circuits Thread (Anthropic)",
+        source: "https://transformer-circuits.pub/2024/scaling-monosemanticity/",
+        tag: "sae",
+        cites: ["monosemanticity-2023"],
+        review: "Runs the same dictionary-learning recipe on a production-scale model and finds millions of interpretable features, including abstract, multilingual, multimodal ones — a sycophantic-praise feature, a Golden Gate Bridge feature that fires across languages and images alike. The result that matters most for planning my own experiments: feature quality didn't collapse going from toy models to a frontier model, it mostly held up. Probably the single most important SAE paper on this list."
       },
       {
         id: "actadd-2023",
@@ -493,8 +691,8 @@
         venue: "arXiv",
         source: "https://arxiv.org/abs/2308.10248",
         tag: "steer",
-        cites: ["superposition-2022"],
-        review: "Steers outputs by adding a difference-of-activations vector (e.g. 'love' minus 'hate') into the residual stream at inference time — no gradient step required. Simple enough to reproduce in an afternoon, and a clean existence proof that some high-level behaviors correspond to directions in activation space."
+        cites: ["transformer-circuits-2021"],
+        review: "Steers outputs by adding a difference-of-activations vector — e.g. activations on 'love' minus activations on 'hate' — into the residual stream at inference, no gradient step required. Simple enough to reproduce in an afternoon, and a clean existence proof that $h + v$ changes behavior at all: some high-level behaviors really do correspond to directions in activation space. The open question I keep circling back to: why does this work as well as it does?"
       },
       {
         id: "repe-2023",
@@ -503,20 +701,86 @@
         year: 2023,
         venue: "arXiv",
         source: "https://arxiv.org/abs/2310.01405",
-        tag: "repr",
-        cites: ["actadd-2023", "superposition-2022"],
-        review: "Argues for reading and controlling representations directly: extract a direction for a concept (honesty, power-seeking) from contrastive prompts, then use it both as a monitor (read the projection) and a controller (add it back in). Interpretability and control as the same operation, run in two directions — the framing I keep coming back to."
+        tag: "steer",
+        cites: ["actadd-2023"],
+        review: "Generalizes activation addition into a full research program: behavior → representation → control. Extract a direction for a concept (honesty, power-seeking) from contrastive prompts, then use it both as a monitor (read the projection) and a controller (add it back in). Probably the most important steering paper for where I want to take this — interpretability and control as the same operation, run in two directions."
       },
       {
-        id: "linrep-2023",
-        title: "The Linear Representation Hypothesis and the Geometry of Large Language Models",
-        authors: "K. Park, Y. J. Choe, V. Veitch",
+        id: "steering-distillation-2026",
+        title: "Subliminal Learning Is Steering Vector Distillation",
+        authors: "C. Blank, A. Bhatia, S. Rajamanoharan, A. Conmy, N. Nanda",
+        year: 2026,
+        venue: "arXiv",
+        source: "https://arxiv.org/abs/2606.00995",
+        tag: "steer",
+        cites: ["repe-2023", "actadd-2023"],
+        review: "Explains a strange phenomenon — a student model picking up a teacher's unstated trait from outputs that never mention it — as steering-vector distillation: the teacher's system prompt is well-approximated by a single steering vector, and fine-tuning on the teacher's outputs teaches the student roughly that same vector. The necessity/sufficiency framing is the part I want to reuse: a trait transmits subliminally exactly when it's well captured by a steering vector, and not otherwise. Currently reading this closely — most relevant paper here to where I want to go next."
+      },
+      {
+        id: "intrinsic-dim-2020",
+        title: "Intrinsic Dimensionality Explains the Effectiveness of Language Model Fine-Tuning",
+        authors: "A. Aghajanyan, L. Zettlemoyer, S. Gupta",
+        year: 2020,
+        venue: "arXiv",
+        source: "https://arxiv.org/abs/2012.13255",
+        tag: "replearn",
+        cites: [],
+        review: "Measures how few dimensions a random, low-rank re-parameterization of the weight update needs before fine-tuning still recovers most of full fine-tuning's performance — and finds that number is surprisingly small, shrinking further with pretraining scale. The connection to steering that put this on the list: if adaptation genuinely lives in a low-dimensional subspace, that's exactly the kind of structure a single steering vector could be expected to exploit."
+      },
+      {
+        id: "task-arithmetic-2022",
+        title: "Editing Models with Task Arithmetic",
+        authors: "G. Ilharco, M. T. Ribeiro, M. Wortsman, et al.",
+        year: 2022,
+        venue: "arXiv",
+        source: "https://arxiv.org/abs/2212.04089",
+        tag: "replearn",
+        cites: ["intrinsic-dim-2020"],
+        review: "Defines a 'task vector' as the difference between a fine-tuned checkpoint's weights and the pretrained weights it started from, then shows these vectors behave arithmetically — adding one installs a capability, negating one removes it, adding several combines them. Reads like activation steering one level up: the same difference-of-means idea, operating on parameters instead of activations. Worth reading deeply; a lot of later steering ideas trace back to this."
+      },
+      {
+        id: "rome-2022",
+        title: "Locating and Editing Factual Associations in GPT (ROME)",
+        authors: "K. Meng, D. Bau, A. Andonian, Y. Belinkov",
+        year: 2022,
+        venue: "NeurIPS",
+        source: "https://arxiv.org/abs/2202.05262",
+        tag: "modeledit",
+        cites: [],
+        review: "Uses causal tracing to localize a specific factual association ('The Eiffel Tower is in Paris') to a narrow band of MLP layers, then treats that MLP as a key-value memory and overwrites a single entry with a rank-one weight update. The question worth sitting with: can specific knowledge be modified directly, permanently, without retraining? — a genuinely different move from steering, which changes nothing in the weights."
+      },
+      {
+        id: "memit-2022",
+        title: "Mass-Editing Memory in a Transformer (MEMIT)",
+        authors: "K. Meng, A. Sharma, A. Andonian, Y. Belinkov, D. Bau",
+        year: 2022,
+        venue: "ICLR",
+        source: "https://arxiv.org/abs/2210.07229",
+        tag: "modeledit",
+        cites: ["rome-2022"],
+        review: "Extends ROME from editing one fact to thousands at once, by spreading the update across a range of MLP layers instead of concentrating it in one. Mostly a scaling and stability result over ROME rather than a new mechanism — a good reminder that 'edit the weights' and 'steer the activations' sit on a spectrum of permanence, not a strict dichotomy."
+      },
+      {
+        id: "constitutional-ai-2022",
+        title: "Constitutional AI: Harmlessness from AI Feedback",
+        authors: "Y. Bai, S. Kadavath, S. Kundu, et al.",
+        year: 2022,
+        venue: "arXiv",
+        source: "https://arxiv.org/abs/2212.08073",
+        tag: "align",
+        cites: [],
+        review: "Replaces human harmlessness labels with a written constitution and the model's own self-critiques against it, in a supervised self-revision phase followed by an RLAIF preference phase. Deliberately not diving deep here — the point of including it is understanding what interpretability work is trying to verify or replace: 'the model says it's following the constitution' versus 'we can actually see it doing so.'"
+      },
+      {
+        id: "bereska-review-2024",
+        title: "Mechanistic Interpretability for AI Safety: A Review",
+        authors: "L. Bereska, E. Gavves",
         year: 2024,
-        venue: "ICML",
-        source: "https://arxiv.org/abs/2311.03658",
-        tag: "repr",
-        cites: ["repe-2023"],
-        review: "Formalizes when 'concepts are directions' is actually a coherent claim, distinguishing a causal inner product from the plain token-embedding one. Useful as a sanity check before assuming a steering vector I extract corresponds to the concept I think it does."
+        venue: "arXiv",
+        source: "https://arxiv.org/abs/2404.14082",
+        tag: "align",
+        cites: ["transformer-circuits-2021", "repe-2023", "constitutional-ai-2022"],
+        review: "The capstone for this reading list: walks through circuits, superposition, probing, and steering as a single research program and makes the safety case for each — not 'interpretability is nice to have' but specifically what each technique would let us catch that behavioral testing wouldn't. Probably the best overview paper for where I'm headed; saving it for last, once the individual papers it summarizes aren't new to me anymore."
       }
     ],
 
@@ -549,9 +813,13 @@
   };
 
   var CATEGORY = {
+    prereq: { label: "Prerequisite", varName: "--cat-prereq" },
     interp: { label: "Mechanistic Interpretability", varName: "--cat-opt" },
+    sae: { label: "Sparse Autoencoders", varName: "--cat-repr" },
     steer: { label: "Activation Steering", varName: "--cat-slt" },
-    repr: { label: "Representation Engineering", varName: "--cat-repr" }
+    replearn: { label: "Representation Learning", varName: "--cat-replearn" },
+    modeledit: { label: "Model Editing", varName: "--cat-modeledit" },
+    align: { label: "Alignment Foundations", varName: "--cat-align" }
   };
 
   // ---------- routing ----------
@@ -701,10 +969,10 @@
     nodeGroup.on("click", function (ev, d) { openPanel(d.data); });
 
     var sim = d3.forceSimulation(nodes)
-      .force("link", d3.forceLink(links).id(function (d) { return d.id; }).distance(130).strength(0.7))
-      .force("charge", d3.forceManyBody().strength(-320))
+      .force("link", d3.forceLink(links).id(function (d) { return d.id; }).distance(105).strength(0.6))
+      .force("charge", d3.forceManyBody().strength(-260))
       .force("center", d3.forceCenter(width / 2, height / 2))
-      .force("collide", d3.forceCollide().radius(function (d) { return d.r + 26; }));
+      .force("collide", d3.forceCollide().radius(function (d) { return d.r + 22; }));
 
     sim.on("tick", function () {
       edgeSel.attr("d", function (d) {
