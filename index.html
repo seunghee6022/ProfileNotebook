@@ -1,0 +1,813 @@
+<title>Seunghee's Notebook</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Serif+4:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --paper: #F3F4EF;
+    --paper-raised: #FFFFFF;
+    --ink: #1B1F2A;
+    --ink-soft: #4B5165;
+    --ink-faint: #8A8F9C;
+    --accent: #2C4A7C;
+    --accent-soft: #E4EAF3;
+    --accent-warm: #B5722E;
+    --accent-warm-soft: #F3E6D4;
+    --line: #D8DAD2;
+    --line-strong: #B9BDB2;
+    --good: #3D7A5C;
+    --shadow: 0 10px 28px rgba(27,31,42,0.10);
+    --cat-opt: #2C4A7C;
+    --cat-slt: #A23E48;
+    --cat-repr: #6B4C9A;
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #14161B;
+      --paper-raised: #1B1E25;
+      --ink: #E8E9E3;
+      --ink-soft: #ACB1BE;
+      --ink-faint: #6E7280;
+      --accent: #8FB3EC;
+      --accent-soft: #22314A;
+      --accent-warm: #E3A75E;
+      --accent-warm-soft: #3A2E1C;
+      --line: #2A2D33;
+      --line-strong: #3B3F47;
+      --good: #6FBE94;
+      --shadow: 0 10px 28px rgba(0,0,0,0.4);
+      --cat-opt: #8FB3EC;
+      --cat-slt: #E08A92;
+      --cat-repr: #B79BE0;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #14161B;
+    --paper-raised: #1B1E25;
+    --ink: #E8E9E3;
+    --ink-soft: #ACB1BE;
+    --ink-faint: #6E7280;
+    --accent: #8FB3EC;
+    --accent-soft: #22314A;
+    --accent-warm: #E3A75E;
+    --accent-warm-soft: #3A2E1C;
+    --line: #2A2D33;
+    --line-strong: #3B3F47;
+    --good: #6FBE94;
+    --shadow: 0 10px 28px rgba(0,0,0,0.4);
+    --cat-opt: #8FB3EC;
+    --cat-slt: #E08A92;
+    --cat-repr: #B79BE0;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Source Serif 4", Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, .display {
+    font-family: "Fraunces", Georgia, serif;
+    text-wrap: balance;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .mono {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+  }
+  a { color: var(--accent); }
+  button { font-family: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  #app { max-width: 1120px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* ---- banner ---- */
+  #sample-banner {
+    background: var(--accent-warm-soft);
+    border-bottom: 1px solid var(--line);
+    padding: 10px 24px;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    text-align: center;
+  }
+  #sample-banner strong { color: var(--ink); }
+  #sample-banner button {
+    background: none; border: 1px solid var(--line-strong); border-radius: 999px;
+    padding: 2px 10px; font-size: 0.78rem; color: var(--ink-soft); cursor: pointer; flex-shrink: 0;
+  }
+  #sample-banner button:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ---- nav ---- */
+  nav {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in srgb, var(--paper) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 28px;
+    padding: 16px 24px; max-width: 1120px; margin: 0 auto;
+    flex-wrap: wrap;
+  }
+  .site-mark { font-family: "Fraunces", serif; font-weight: 600; font-size: 1.15rem; margin-right: auto; }
+  .site-mark .dot { color: var(--accent-warm); }
+  .tabs { display: flex; gap: 4px; }
+  .tab-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 0.92rem; color: var(--ink-soft); padding: 8px 12px; border-radius: 8px;
+    position: relative;
+  }
+  .tab-btn:hover { color: var(--ink); background: var(--accent-soft); }
+  .tab-btn[aria-current="page"] { color: var(--accent); font-weight: 600; }
+  .tab-btn[aria-current="page"]::after {
+    content: ""; position: absolute; left: 12px; right: 12px; bottom: 1px; height: 2px; background: var(--accent);
+  }
+
+  main { padding-top: 40px; }
+  .view { display: none; }
+  .view.active { display: block; animation: fade .25s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .view.active { animation: none; } }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent-warm); margin: 0 0 10px;
+  }
+
+  /* ---- profile ---- */
+  .profile-grid { display: grid; grid-template-columns: 240px 1fr; gap: 56px; align-items: start; }
+  @media (max-width: 720px) { .profile-grid { grid-template-columns: 1fr; } }
+  .avatar {
+    width: 168px; height: 168px; border-radius: 50%;
+    background: linear-gradient(155deg, var(--accent), var(--cat-slt));
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-family: "Fraunces", serif; font-size: 3.4rem; font-weight: 600;
+    box-shadow: var(--shadow); margin-bottom: 20px;
+  }
+  .links { display: flex; flex-direction: column; gap: 8px; font-size: 0.92rem; }
+  .links a { color: var(--ink-soft); text-decoration: none; display: flex; gap: 8px; }
+  .links a:hover { color: var(--accent); }
+  h1.name { font-size: 2.6rem; margin: 0 0 6px; }
+  .tagline { color: var(--ink-soft); font-size: 1.15rem; margin: 0 0 24px; max-width: 60ch; }
+  .bio p { max-width: 66ch; line-height: 1.7; color: var(--ink); margin: 0 0 16px; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 36px; }
+  .chip {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; padding: 5px 11px;
+    background: var(--accent-soft); color: var(--accent); border-radius: 999px;
+  }
+  .timeline { border-left: 2px solid var(--line); margin-left: 4px; padding-left: 24px; display: flex; flex-direction: column; gap: 22px; }
+  .timeline-item { position: relative; }
+  .timeline-item::before {
+    content: ""; position: absolute; left: -29px; top: 5px; width: 10px; height: 10px; border-radius: 50%;
+    background: var(--paper); border: 2px solid var(--accent-warm);
+  }
+  .timeline-item .t-when { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--ink-faint); }
+  .timeline-item .t-what { font-weight: 600; margin: 2px 0 3px; }
+  .timeline-item .t-desc { color: var(--ink-soft); font-size: 0.92rem; max-width: 56ch; line-height: 1.55; }
+  .placeholder-note { font-size: 0.78rem; color: var(--ink-faint); font-style: italic; }
+
+  /* ---- blog ---- */
+  .post-list { display: flex; flex-direction: column; gap: 2px; max-width: 74ch; }
+  .post-card {
+    background: var(--paper-raised); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 20px 22px; cursor: pointer; margin-bottom: 12px; transition: border-color .15s, box-shadow .15s;
+  }
+  .post-card:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+  .post-card .p-meta { display: flex; gap: 10px; align-items: center; font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--ink-faint); margin-bottom: 8px; }
+  .tag-pill { background: var(--accent-warm-soft); color: var(--accent-warm); padding: 2px 8px; border-radius: 999px; }
+  .post-card h3 { margin: 0 0 8px; font-size: 1.3rem; }
+  .post-card .excerpt { color: var(--ink-soft); font-size: 0.95rem; line-height: 1.6; margin: 0; }
+  .post-reader { max-width: 68ch; }
+  .back-link { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 0.9rem; padding: 0; margin-bottom: 24px; font-family: "IBM Plex Mono", monospace; }
+  .post-reader h2 { font-size: 2rem; margin: 0 0 6px; }
+  .post-body { line-height: 1.85; font-size: 1.05rem; }
+  .post-body p { margin: 0 0 18px; }
+  .post-body .mjx-container { margin: 4px 0; }
+
+  /* ---- papers ---- */
+  .papers-toolbar {
+    display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-bottom: 18px;
+  }
+  #paper-search {
+    background: var(--paper-raised); border: 1px solid var(--line); border-radius: 999px;
+    padding: 9px 16px; font-size: 0.9rem; color: var(--ink); min-width: 220px; font-family: inherit;
+  }
+  #paper-search:focus { border-color: var(--accent); }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-left: auto; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--ink-soft); background: none; border: none; cursor: pointer; padding: 2px 4px; opacity: 1; }
+  .legend-item.dim { opacity: 0.35; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .graph-wrap {
+    position: relative; border: 1px solid var(--line); border-radius: var(--radius);
+    background: var(--paper-raised); height: 560px; overflow: hidden;
+  }
+  #graph-svg { width: 100%; height: 100%; cursor: grab; }
+  #graph-svg:active { cursor: grabbing; }
+  .node-circle { stroke: var(--paper-raised); stroke-width: 2px; cursor: pointer; }
+  .node-label { font-family: "IBM Plex Mono", monospace; font-size: 10px; fill: var(--ink-soft); pointer-events: none; }
+  .edge-path { fill: none; stroke: var(--line-strong); stroke-width: 1.3px; }
+  .graph-hint {
+    position: absolute; left: 16px; bottom: 14px; font-size: 0.75rem; color: var(--ink-faint);
+    font-family: "IBM Plex Mono", monospace; background: color-mix(in srgb, var(--paper-raised) 85%, transparent);
+    padding: 4px 10px; border-radius: 6px;
+  }
+  .panel {
+    position: absolute; top: 0; right: 0; height: 100%; width: 340px; max-width: 88%;
+    background: var(--paper-raised); border-left: 1px solid var(--line); box-shadow: var(--shadow);
+    transform: translateX(100%); transition: transform .22s ease; overflow-y: auto; padding: 24px;
+  }
+  .panel.open { transform: translateX(0); }
+  .panel-close { background: none; border: none; color: var(--ink-faint); cursor: pointer; font-size: 1.3rem; float: right; line-height: 1; }
+  .panel h3 { font-size: 1.2rem; margin: 8px 0 4px; padding-right: 20px; }
+  .panel .p-authors { color: var(--ink-soft); font-size: 0.88rem; margin-bottom: 4px; }
+  .panel .p-venue { font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--ink-faint); margin-bottom: 14px; }
+  .panel .p-source {
+    display: inline-block; font-size: 0.82rem; color: var(--accent); border: 1px solid var(--accent);
+    border-radius: 999px; padding: 5px 13px; text-decoration: none; margin-bottom: 18px;
+  }
+  .panel .p-source:hover { background: var(--accent-soft); }
+  .panel .p-label { font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); margin: 16px 0 6px; }
+  .panel .p-review { font-size: 0.92rem; line-height: 1.65; color: var(--ink); }
+  .panel .p-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  /* ---- cv ---- */
+  .cv-sheet { max-width: 74ch; background: var(--paper-raised); border: 1px solid var(--line); border-radius: var(--radius); padding: 44px 48px; box-shadow: var(--shadow); }
+  .cv-head { display: flex; gap: 20px; align-items: center; margin-bottom: 28px; border-bottom: 2px solid var(--ink); padding-bottom: 20px; }
+  .cv-avatar { width: 76px; height: 76px; border-radius: 50%; flex-shrink: 0; background: linear-gradient(155deg, var(--accent), var(--cat-slt)); color: #fff; display: flex; align-items: center; justify-content: center; font-family: "Fraunces", serif; font-size: 1.7rem; font-weight: 600; }
+  .cv-head h2 { margin: 0 0 3px; font-size: 1.7rem; }
+  .cv-head .cv-title { color: var(--ink-soft); font-size: 0.95rem; }
+  .cv-head .cv-contact { font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--ink-faint); margin-top: 6px; }
+  .cv-print { margin-left: auto; background: var(--ink); color: var(--paper); border: none; border-radius: 999px; padding: 9px 18px; font-size: 0.85rem; cursor: pointer; flex-shrink: 0; }
+  .cv-section { margin-bottom: 26px; }
+  .cv-section h3 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent-warm); font-family: "IBM Plex Mono", monospace; margin: 0 0 12px; font-weight: 500; }
+  .cv-entry { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+  .cv-entry .cv-main { font-weight: 600; font-size: 0.98rem; }
+  .cv-entry .cv-sub { color: var(--ink-soft); font-size: 0.88rem; }
+  .cv-entry .cv-when { font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--ink-faint); white-space: nowrap; }
+  .cv-empty { color: var(--ink-faint); font-size: 0.88rem; font-style: italic; }
+  .skill-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  @media print {
+    #sample-banner, nav, .cv-print { display: none !important; }
+    #app { max-width: none; padding: 0; }
+    .view:not(#view-cv) { display: none !important; }
+    .cv-sheet { box-shadow: none; border: none; max-width: none; }
+    body { background: #fff; }
+  }
+</style>
+
+<div id="sample-banner">
+  <span>📝 <strong>Profile and CV are real</strong> — the Math Blog and Paper Archive below are still sample content so you can see how the features work. Send a real post or paper link to replace them.</span>
+  <button id="banner-dismiss" type="button">Dismiss</button>
+</div>
+
+<nav>
+  <div class="site-mark">Seunghee<span class="dot">.</span>notebook</div>
+  <div class="tabs" id="tabs">
+    <button class="tab-btn" data-route="profile">Profile</button>
+    <button class="tab-btn" data-route="blog">Math Blog</button>
+    <button class="tab-btn" data-route="papers">Papers</button>
+    <button class="tab-btn" data-route="cv">CV</button>
+  </div>
+</nav>
+
+<div id="app">
+  <main>
+
+    <section class="view" id="view-profile">
+      <div class="profile-grid">
+        <div>
+          <div class="avatar">SJ</div>
+          <div class="links" id="profile-links"></div>
+        </div>
+        <div>
+          <p class="eyebrow">PhD Preparation Notebook</p>
+          <h1 class="name">Seunghee Jeong</h1>
+          <p class="tagline">Prospective PhD researcher working on mechanistic interpretability and representation engineering — how behavior-relevant representations emerge, and how to control them through activation steering.</p>
+          <div class="bio" id="profile-bio"></div>
+          <p class="eyebrow" style="margin-top:36px;">Research Interests</p>
+          <div class="chip-row" id="interest-chips"></div>
+          <p class="eyebrow">Path So Far</p>
+          <div class="timeline" id="timeline"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-blog">
+      <div id="blog-list-view">
+        <p class="eyebrow">Math Blog</p>
+        <h1 style="margin:0 0 8px;">Notes &amp; Workings</h1>
+        <p class="tagline" style="margin-bottom:32px;">Short write-ups from working through material for PhD preparation — proofs, intuition, and things that took a second pass to click.</p>
+        <div class="post-list" id="post-list"></div>
+      </div>
+      <div id="blog-reader-view" style="display:none;">
+        <button class="back-link" id="back-to-posts">← all posts</button>
+        <div class="post-reader" id="post-reader-body"></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-papers">
+      <p class="eyebrow">Paper Archive</p>
+      <h1 style="margin:0 0 8px;">Citation Graph</h1>
+      <p class="tagline" style="margin-bottom:4px;">Every reviewed paper as a node; an edge means one paper cites another that's also in the archive. Click a node for the full review.</p>
+      <p class="placeholder-note" style="margin-bottom:24px;">Sample seed set below: real papers in mechanistic interpretability, activation steering, and representation engineering — citation edges are illustrative for this demo, not checked against the actual reference lists. Send a paper link to replace this set with your real archive.</p>
+      <div class="papers-toolbar">
+        <input id="paper-search" type="search" placeholder="Search title or author…">
+        <div class="legend" id="paper-legend"></div>
+      </div>
+      <div class="graph-wrap">
+        <svg id="graph-svg"></svg>
+        <div class="graph-hint">drag to rearrange · scroll to zoom · click a node</div>
+        <aside class="panel" id="paper-panel">
+          <button class="panel-close" id="panel-close" aria-label="Close">×</button>
+          <div id="panel-body"></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="view" id="view-cv">
+      <div class="cv-sheet">
+        <div class="cv-head">
+          <div class="cv-avatar">SJ</div>
+          <div>
+            <h2>Seunghee Jeong</h2>
+            <div class="cv-title">PhD Applicant · Mechanistic Interpretability &amp; Representation Engineering</div>
+            <div class="cv-contact" id="cv-contact"></div>
+          </div>
+          <button class="cv-print" id="cv-print">Save as PDF</button>
+        </div>
+        <div class="cv-section">
+          <h3>Education</h3>
+          <div id="cv-education"></div>
+        </div>
+        <div class="cv-section">
+          <h3>Research &amp; Industry Experience</h3>
+          <div id="cv-experience"></div>
+        </div>
+        <div class="cv-section">
+          <h3>Selected Projects</h3>
+          <div id="cv-projects"></div>
+        </div>
+        <div class="cv-section">
+          <h3>Publications</h3>
+          <div id="cv-publications"></div>
+        </div>
+        <div class="cv-section">
+          <h3>Skills</h3>
+          <div class="skill-row" id="cv-skills"></div>
+        </div>
+        <div class="cv-section">
+          <h3>Certifications</h3>
+          <div class="skill-row" id="cv-certs"></div>
+        </div>
+        <div class="cv-section">
+          <h3>Languages</h3>
+          <div class="skill-row" id="cv-languages"></div>
+        </div>
+        <div class="cv-section">
+          <h3>Awards &amp; Fellowships</h3>
+          <div id="cv-awards"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] },
+    svg: { fontCache: 'local' },
+    options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js"></script>
+
+<script>
+(function () {
+  "use strict";
+
+  var SITE_DATA = {
+    profile: {
+      email: "seunghee6022@gmail.com",
+      links: [
+        { label: "Email", href: "mailto:seunghee6022@gmail.com" },
+        { label: "LinkedIn", href: "https://www.linkedin.com/in/seunghee-jeong/" },
+        { label: "Google Scholar (add link)", href: "#" },
+        { label: "GitHub (add link)", href: "#" }
+      ],
+      bio: [
+        "I'm a GenAI engineer at Deloitte's Risk Advisory practice in Munich, building retrieval-augmented and agentic LLM systems for compliance and risk analysis. Before that I was an ML engineer intern at AWS Professional Services and a research assistant at the German Aerospace Center (DLR), where I built a transformer-based vulnerability detector guided by a hierarchical CWE taxonomy. I hold an Elite Master's in Data Science from LMU Munich and a B.S. in Industrial Management Engineering from Kumoh National Institute of Technology.",
+        "I'm now preparing PhD applications in mechanistic interpretability and representation engineering. I want to understand how behavior-relevant representations emerge inside models and how they can be steered through direct activation interventions — with goal representation, agency representation, and mechanistic alignment as the directions I want to keep pulling on for the long term."
+      ],
+      interests: ["Mechanistic Interpretability", "Representation Engineering", "Activation Steering", "Goal Representation", "Agency Representation", "Mechanistic Alignment"],
+      timeline: [
+        { when: "2026 – now", what: "Preparing PhD applications", desc: "Reading circuits/superposition/steering literature and working through the math (linear algebra, probability, optimization) behind it, alongside full-time work." },
+        { when: "May 2024 – present", what: "GenAI Engineer, Deloitte (Risk Advisory · AIDA)", desc: "Lead ML engineer for LLM/RAG/agentic-workflow platforms across compliance, risk analysis, and document intelligence." },
+        { when: "Jun 2023 – Sep 2023", what: "ML Engineer Intern, AWS Professional Services AI/ML", desc: "Built a production-grade GenAI MLOps/LLMOps template on SageMaker; fine-tuned Falcon with QLoRA + Optuna." },
+        { when: "Dec 2022 – Nov 2023", what: "Research Assistant (NLP), German Aerospace Center (DLR)", desc: "Transformer-based vulnerability detector using a CWE hierarchy encoded as a DAG (NetworkX) inside a hierarchical classifier." },
+        { when: "Oct 2020 – Jan 2024", what: "Elite M.Sc. Data Science, LMU Munich", desc: "Focus: machine learning, unsupervised learning, NLP, deep learning, statistical modeling." }
+      ]
+    },
+
+    posts: [
+      {
+        id: "spectral-theorem",
+        title: "Why the Spectral Theorem Still Surprises Me",
+        date: "2026-03-02",
+        tags: ["Linear Algebra"],
+        excerpt: "Every normal operator on a finite-dimensional inner product space diagonalizes in an orthonormal basis — a one-line statement that took me a full afternoon to actually believe.",
+        body:
+          "<p>The statement is short: if $T$ is a normal operator on a finite-dimensional complex inner product space ($TT^* = T^*T$), then there is an orthonormal basis of eigenvectors, and</p>" +
+          "<p>$$ T = \\sum_{i=1}^n \\lambda_i \\, \\langle \\cdot, e_i \\rangle \\, e_i $$</p>" +
+          "<p>where $\\{e_i\\}$ is that orthonormal basis and $\\lambda_i$ the corresponding eigenvalues. What surprised me on a second read wasn't the result — it's that normality is exactly the condition that makes $T$ and $T^*$ share eigenvectors. Once you see $\\|Tv\\| = \\|T^*v\\|$ falling straight out of $\\langle Tv, Tv\\rangle = \\langle T^*Tv, v\\rangle = \\langle TT^*v, v\\rangle = \\langle T^*v, T^*v\\rangle$, the rest of the proof (induction on dimension, peel off one eigenvector, restrict to the orthogonal complement) writes itself.</p>" +
+          "<p>The part worth remembering for prelims: self-adjoint and unitary operators are both normal, so this one theorem quietly contains two of the results I used to memorize separately.</p>"
+      },
+      {
+        id: "measure-theoretic-probability",
+        title: "A First Pass at Measure-Theoretic Probability",
+        date: "2026-02-14",
+        tags: ["Probability", "Analysis"],
+        excerpt: "Rebuilding expectation as a Lebesgue integral over a probability space, and why the extra rigor over an undergrad course actually buys something.",
+        body:
+          "<p>A probability space is a measure space $(\\Omega, \\mathcal{F}, \\mathbb{P})$ with $\\mathbb{P}(\\Omega) = 1$, and a random variable is just an $\\mathcal{F}$-measurable function $X : \\Omega \\to \\mathbb{R}$. Expectation is then nothing exotic:</p>" +
+          "<p>$$ \\mathbb{E}[X] = \\int_\\Omega X \\, d\\mathbb{P} $$</p>" +
+          "<p>What the undergraduate \"sum $p_i x_i$ or integrate $x f(x)\\,dx$\" definitions hide is that they're both this same Lebesgue integral, specialized to a discrete or absolutely-continuous $\\mathbb{P}$. The measure-theoretic version is the one that survives contact with random variables that are neither — mixtures, stopped processes, limits of the two.</p>" +
+          "<p>The payoff I didn't expect: once expectation is an integral, the convergence theorems (monotone, dominated) become the actual engine behind \"can I swap a limit and an expectation,\" which shows up constantly once you get to martingales.</p>"
+      }
+    ],
+
+    papers: [
+      {
+        id: "circuits-2020",
+        title: "Zoom In: An Introduction to Circuits",
+        authors: "C. Olah, N. Cammarata, L. Schubert, et al.",
+        year: 2020,
+        venue: "Distill",
+        source: "https://distill.pub/2020/circuits/zoom-in/",
+        tag: "interp",
+        cites: [],
+        review: "The manifesto for treating networks as programs to reverse-engineer: features as the fundamental unit, circuits as the connections between them. The three claims (features, circuits, universality) still frame how I read every interpretability paper that came after it."
+      },
+      {
+        id: "transformer-circuits-2021",
+        title: "A Mathematical Framework for Transformer Circuits",
+        authors: "N. Elhage, N. Nanda, C. Olah, et al.",
+        year: 2021,
+        venue: "Transformer Circuits Thread (Anthropic)",
+        source: "https://transformer-circuits.pub/2021/framework/index.html",
+        tag: "interp",
+        cites: ["circuits-2020"],
+        review: "Rewrites attention-only transformers as compositions of linear maps you can actually trace — QK and OV circuits, induction heads. The residual stream is additive across layers, so the whole forward pass decomposes into interpretable terms instead of one opaque function."
+      },
+      {
+        id: "superposition-2022",
+        title: "Toy Models of Superposition",
+        authors: "N. Elhage, T. Hume, C. Olah, et al.",
+        year: 2022,
+        venue: "Transformer Circuits Thread (Anthropic)",
+        source: "https://transformer-circuits.pub/2022/toy_model/index.html",
+        tag: "interp",
+        cites: ["transformer-circuits-2021"],
+        review: "The uncomfortable idea that a model can represent more features than it has neurons by packing them into overlapping, non-orthogonal directions when features are sparse. Explains why neurons are so often polysemantic and motivates most of what came after in feature disentanglement, sparse autoencoders included."
+      },
+      {
+        id: "grokking-2023",
+        title: "Progress Measures for Grokking via Mechanistic Interpretability",
+        authors: "N. Nanda, L. Chan, T. Lieberum, J. Smith, J. Steinhardt",
+        year: 2023,
+        venue: "ICLR",
+        source: "https://arxiv.org/abs/2301.05217",
+        tag: "interp",
+        cites: ["transformer-circuits-2021"],
+        review: "Reverse-engineers a one-layer transformer trained on modular addition and finds it implements a Fourier-based algorithm — trig identities standing in for arithmetic. The reusable part isn't the algorithm, it's the method: progress measures that predict the grokking phase transition before test accuracy ever moves."
+      },
+      {
+        id: "actadd-2023",
+        title: "Activation Addition: Steering Language Models Without Optimization",
+        authors: "A. Turner, L. Thiergart, G. Leech, et al.",
+        year: 2023,
+        venue: "arXiv",
+        source: "https://arxiv.org/abs/2308.10248",
+        tag: "steer",
+        cites: ["superposition-2022"],
+        review: "Steers outputs by adding a difference-of-activations vector (e.g. 'love' minus 'hate') into the residual stream at inference time — no gradient step required. Simple enough to reproduce in an afternoon, and a clean existence proof that some high-level behaviors correspond to directions in activation space."
+      },
+      {
+        id: "repe-2023",
+        title: "Representation Engineering: A Top-Down Approach to AI Transparency",
+        authors: "A. Zou, L. Phan, S. Chen, et al.",
+        year: 2023,
+        venue: "arXiv",
+        source: "https://arxiv.org/abs/2310.01405",
+        tag: "repr",
+        cites: ["actadd-2023", "superposition-2022"],
+        review: "Argues for reading and controlling representations directly: extract a direction for a concept (honesty, power-seeking) from contrastive prompts, then use it both as a monitor (read the projection) and a controller (add it back in). Interpretability and control as the same operation, run in two directions — the framing I keep coming back to."
+      },
+      {
+        id: "linrep-2023",
+        title: "The Linear Representation Hypothesis and the Geometry of Large Language Models",
+        authors: "K. Park, Y. J. Choe, V. Veitch",
+        year: 2024,
+        venue: "ICML",
+        source: "https://arxiv.org/abs/2311.03658",
+        tag: "repr",
+        cites: ["repe-2023"],
+        review: "Formalizes when 'concepts are directions' is actually a coherent claim, distinguishing a causal inner product from the plain token-embedding one. Useful as a sanity check before assuming a steering vector I extract corresponds to the concept I think it does."
+      }
+    ],
+
+    cv: {
+      contact: "(+49) 1782 081659 · seunghee6022@gmail.com · linkedin.com/in/seunghee-jeong · Munich, Germany",
+      education: [
+        { main: "Elite M.Sc. Data Science", sub: "Ludwig-Maximilians-Universität München (LMU) — ML, unsupervised learning, NLP, deep learning, statistical modeling. GPA 2.3 (Good)", when: "Oct 2020 – Jan 2024" },
+        { main: "B.Sc. Industrial Management Engineering", sub: "Kumoh National Institute of Technology — data mining, databases, algorithms, operations research. GPA 4.07/4.5 (94.7%)", when: "Mar 2015 – Aug 2019" }
+      ],
+      experience: [
+        { main: "GenAI Engineer / Full-Stack Developer / Consultant — Risk Advisory, AIDA", sub: "Deloitte, Munich — lead ML engineer for GenAI/RAG/agentic-workflow platforms; agent frameworks for IT-security and financial due-diligence.", when: "May 2024 – present" },
+        { main: "Graduate Student Research Assistant", sub: "CIS, LMU Munich — curated Korean–English multilingual datasets for cross-lingual LLM research and evaluation.", when: "Jul 2024 – Sep 2024" },
+        { main: "Intern — Data Scientist / ML Engineer, Professional Services AI/ML", sub: "AWS, Munich — production GenAI MLOps/LLMOps template on SageMaker; fine-tuned Falcon (QLoRA) with Optuna HPO.", when: "Jun 2023 – Sep 2023" },
+        { main: "Research Assistant — Data Scientist (NLP)", sub: "German Aerospace Center (DLR), Jena — transformer-based vulnerability detector using a CWE hierarchy (NetworkX DAG) in a hierarchical classifier.", when: "Dec 2022 – Nov 2023" },
+        { main: "Working Student — Data Scientist", sub: "OroraTech, Munich — wildfire detection from satellite/NASA geodata; Streamlit dashboards on GCP.", when: "Jul 2022 – Nov 2022" },
+        { main: "Volunteer — Data Scientist", sub: "MI4People, Munich — medical image classification with computer-vision models deployed on Azure ML.", when: "May 2022 – Apr 2023" },
+        { main: "Intern — Data Scientist / Front-End Developer", sub: "Samsung Electronics, Gumi-si — pose-detection yoga coach and an OCR + sentiment-analysis travel planner.", when: "Jan 2020 – Sep 2020" }
+      ],
+      projects: [
+        { main: "Agentic AI — Financial Analysis Agent for Due Diligence", sub: "Deloitte — project management & tech lead for a multi-agent system (LangGraph) with LLM slide generation and human-in-the-loop feedback.", when: "Apr 2025 – present" },
+        { main: "GenAI Document Platform — Compliance Check", sub: "Deloitte — RAG-based automated document compliance using chain-of-thought evaluation; performance improved up to 61%.", when: "Jun 2024 – Nov 2024" },
+        { main: "IBM × Deloitte — AI Governance Platform", sub: "Deloitte — platform components for AI governance aligned with the EU AI Act; risk classification and audit interfaces.", when: "Sep 2024 – Dec 2024" },
+        { main: "Tabular Data Augmentation with LLMs", sub: "Kumoh National Institute of Technology — fine-tuned LLM for distribution-aware augmentation with self-evaluation loops.", when: "Apr 2025 – present" }
+      ],
+      skills: ["Python", "PyTorch", "Pandas", "Git", "React", "Vue.js", "Django", "MySQL", "Weaviate (Vector DB)", "AWS SageMaker", "Azure DevOps", "TensorFlow", "NetworkX"],
+      certs: ["IBM WatsonX Governance Certificate", "Oracle Cloud Infrastructure 2024 Foundations Associate", "AWS Certification (in progress)"],
+      languages: ["Korean — Native", "English — C1", "German — B1"],
+      awards: []
+    }
+  };
+
+  var CATEGORY = {
+    interp: { label: "Mechanistic Interpretability", varName: "--cat-opt" },
+    steer: { label: "Activation Steering", varName: "--cat-slt" },
+    repr: { label: "Representation Engineering", varName: "--cat-repr" }
+  };
+
+  // ---------- routing ----------
+  var routes = ["profile", "blog", "papers", "cv"];
+  function go(route) {
+    if (routes.indexOf(route) === -1) route = "profile";
+    document.querySelectorAll(".view").forEach(function (v) { v.classList.remove("active"); });
+    document.getElementById("view-" + route).classList.add("active");
+    document.querySelectorAll(".tab-btn").forEach(function (b) {
+      if (b.dataset.route === route) b.setAttribute("aria-current", "page");
+      else b.removeAttribute("aria-current");
+    });
+    if (route === "papers" && !graphBuilt) buildGraph();
+    location.hash = "#/" + route;
+  }
+  document.getElementById("tabs").addEventListener("click", function (e) {
+    var btn = e.target.closest(".tab-btn");
+    if (btn) go(btn.dataset.route);
+  });
+  window.addEventListener("hashchange", function () {
+    go((location.hash.replace("#/", "")) || "profile");
+  });
+
+  // ---------- banner ----------
+  var banner = document.getElementById("sample-banner");
+  try {
+    if (localStorage.getItem("notebook-banner-dismissed") === "1") banner.style.display = "none";
+  } catch (e) {}
+  document.getElementById("banner-dismiss").addEventListener("click", function () {
+    banner.style.display = "none";
+    try { localStorage.setItem("notebook-banner-dismissed", "1"); } catch (e) {}
+  });
+
+  // ---------- profile ----------
+  (function renderProfile() {
+    var linksEl = document.getElementById("profile-links");
+    SITE_DATA.profile.links.forEach(function (l) {
+      var a = document.createElement("a");
+      a.href = l.href; a.textContent = l.label;
+      if (l.href.indexOf("mailto") !== 0) { a.target = "_blank"; a.rel = "noopener"; }
+      linksEl.appendChild(a);
+    });
+    var bioEl = document.getElementById("profile-bio");
+    SITE_DATA.profile.bio.forEach(function (p) {
+      var el = document.createElement("p");
+      el.textContent = p;
+      bioEl.appendChild(el);
+    });
+    var chipsEl = document.getElementById("interest-chips");
+    SITE_DATA.profile.interests.forEach(function (i) {
+      var c = document.createElement("span"); c.className = "chip"; c.textContent = i;
+      chipsEl.appendChild(c);
+    });
+    var tlEl = document.getElementById("timeline");
+    SITE_DATA.profile.timeline.forEach(function (t) {
+      var item = document.createElement("div"); item.className = "timeline-item";
+      item.innerHTML = '<div class="t-when">' + t.when + '</div><div class="t-what">' + t.what + '</div><div class="t-desc">' + t.desc + '</div>';
+      tlEl.appendChild(item);
+    });
+  })();
+
+  // ---------- blog ----------
+  var listView = document.getElementById("blog-list-view");
+  var readerView = document.getElementById("blog-reader-view");
+  (function renderBlogList() {
+    var listEl = document.getElementById("post-list");
+    SITE_DATA.posts.slice().sort(function (a, b) { return b.date.localeCompare(a.date); }).forEach(function (p) {
+      var card = document.createElement("div"); card.className = "post-card";
+      card.innerHTML =
+        '<div class="p-meta"><span>' + p.date + '</span>' + p.tags.map(function (t) { return '<span class="tag-pill">' + t + '</span>'; }).join("") + '</div>' +
+        '<h3>' + p.title + '</h3>' +
+        '<p class="excerpt">' + p.excerpt + '</p>';
+      card.addEventListener("click", function () { openPost(p.id); });
+      listEl.appendChild(card);
+    });
+  })();
+
+  function openPost(id) {
+    var p = SITE_DATA.posts.filter(function (x) { return x.id === id; })[0];
+    if (!p) return;
+    var body = document.getElementById("post-reader-body");
+    body.innerHTML =
+      '<p class="p-meta" style="font-family:\'IBM Plex Mono\',monospace;font-size:.78rem;color:var(--ink-faint);margin-bottom:10px;">' + p.date + '</p>' +
+      '<h2>' + p.title + '</h2>' +
+      '<div class="post-body">' + p.body + '</div>';
+    listView.style.display = "none";
+    readerView.style.display = "block";
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([body]);
+    }
+    window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+  }
+  document.getElementById("back-to-posts").addEventListener("click", function () {
+    readerView.style.display = "none";
+    listView.style.display = "block";
+  });
+
+  // ---------- papers graph ----------
+  var graphBuilt = false;
+  var activeTagFilter = null;
+
+  function buildGraph() {
+    graphBuilt = true;
+    var papers = SITE_DATA.papers;
+    var inDegree = {};
+    papers.forEach(function (p) { inDegree[p.id] = 0; });
+    papers.forEach(function (p) { p.cites.forEach(function (c) { if (inDegree[c] !== undefined) inDegree[c]++; }); });
+
+    var nodes = papers.map(function (p) {
+      return { id: p.id, data: p, r: 14 + Math.min(inDegree[p.id], 4) * 4 };
+    });
+    var links = [];
+    papers.forEach(function (p) {
+      p.cites.forEach(function (c) { links.push({ source: p.id, target: c }); });
+    });
+
+    var wrap = document.querySelector(".graph-wrap");
+    var svg = d3.select("#graph-svg");
+    var width = wrap.clientWidth, height = wrap.clientHeight;
+
+    svg.append("defs").append("marker")
+      .attr("id", "arrow").attr("viewBox", "0 -4 8 8").attr("refX", 22).attr("refY", 0)
+      .attr("markerWidth", 7).attr("markerHeight", 7).attr("orient", "auto")
+      .append("path").attr("d", "M0,-4L8,0L0,4").attr("fill", "var(--line-strong)");
+
+    var zoomLayer = svg.append("g");
+    svg.call(d3.zoom().scaleExtent([0.4, 3]).on("zoom", function (ev) { zoomLayer.attr("transform", ev.transform); }));
+
+    var edgeSel = zoomLayer.append("g").selectAll("path")
+      .data(links).enter().append("path")
+      .attr("class", "edge-path").attr("marker-end", "url(#arrow)");
+
+    var nodeGroup = zoomLayer.append("g").selectAll("g")
+      .data(nodes).enter().append("g").style("cursor", "pointer");
+
+    nodeGroup.append("circle")
+      .attr("class", "node-circle")
+      .attr("r", function (d) { return d.r; })
+      .attr("fill", function (d) { return "var(" + CATEGORY[d.data.tag].varName + ")"; });
+
+    nodeGroup.append("text")
+      .attr("class", "node-label")
+      .attr("text-anchor", "middle")
+      .attr("dy", function (d) { return d.r + 13; })
+      .text(function (d) { return d.data.authors.split(",")[0].split(" ").pop() + " " + d.data.year; });
+
+    nodeGroup.on("click", function (ev, d) { openPanel(d.data); });
+
+    var sim = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).id(function (d) { return d.id; }).distance(130).strength(0.7))
+      .force("charge", d3.forceManyBody().strength(-320))
+      .force("center", d3.forceCenter(width / 2, height / 2))
+      .force("collide", d3.forceCollide().radius(function (d) { return d.r + 26; }));
+
+    sim.on("tick", function () {
+      edgeSel.attr("d", function (d) {
+        return "M" + d.source.x + "," + d.source.y + "L" + d.target.x + "," + d.target.y;
+      });
+      nodeGroup.attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
+    });
+
+    nodeGroup.call(d3.drag()
+      .on("start", function (ev, d) { if (!ev.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on("drag", function (ev, d) { d.fx = ev.x; d.fy = ev.y; })
+      .on("end", function (ev, d) { if (!ev.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+
+    // legend
+    var legendEl = document.getElementById("paper-legend");
+    Object.keys(CATEGORY).forEach(function (key) {
+      var b = document.createElement("button"); b.className = "legend-item"; b.dataset.tag = key;
+      b.innerHTML = '<span class="legend-dot" style="background:var(' + CATEGORY[key].varName + ')"></span>' + CATEGORY[key].label;
+      b.addEventListener("click", function () {
+        activeTagFilter = activeTagFilter === key ? null : key;
+        applyFilter();
+      });
+      legendEl.appendChild(b);
+    });
+
+    function applyFilter() {
+      var q = document.getElementById("paper-search").value.trim().toLowerCase();
+      document.querySelectorAll(".legend-item").forEach(function (b) {
+        b.classList.toggle("dim", !!activeTagFilter && b.dataset.tag !== activeTagFilter);
+      });
+      nodeGroup.style("opacity", function (d) {
+        var matchesTag = !activeTagFilter || d.data.tag === activeTagFilter;
+        var matchesQuery = !q || d.data.title.toLowerCase().indexOf(q) !== -1 || d.data.authors.toLowerCase().indexOf(q) !== -1;
+        return matchesTag && matchesQuery ? 1 : 0.12;
+      });
+      edgeSel.style("opacity", function (d) {
+        var s = d.source.data || d.source, t = d.target.data || d.target;
+        var sOk = (!activeTagFilter || s.tag === activeTagFilter);
+        var tOk = (!activeTagFilter || t.tag === activeTagFilter);
+        return sOk && tOk ? 1 : 0.08;
+      });
+    }
+    document.getElementById("paper-search").addEventListener("input", applyFilter);
+  }
+
+  function openPanel(p) {
+    var panel = document.getElementById("paper-panel");
+    document.getElementById("panel-body").innerHTML =
+      '<p class="p-label">' + CATEGORY[p.tag].label + '</p>' +
+      '<h3>' + p.title + '</h3>' +
+      '<p class="p-authors">' + p.authors + '</p>' +
+      '<p class="p-venue">' + p.venue + ' · ' + p.year + '</p>' +
+      (p.source && p.source !== "#" ? '<a class="p-source" href="' + p.source + '" target="_blank" rel="noopener">View source →</a>' : '') +
+      '<p class="p-label">Review Note</p>' +
+      '<div class="p-review">' + p.review + '</div>';
+    panel.classList.add("open");
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([document.getElementById("panel-body")]);
+    }
+  }
+  document.getElementById("panel-close").addEventListener("click", function () {
+    document.getElementById("paper-panel").classList.remove("open");
+  });
+
+  // ---------- cv ----------
+  (function renderCV() {
+    document.getElementById("cv-contact").textContent = SITE_DATA.cv.contact;
+
+    function fillList(elId, items, empty) {
+      var el = document.getElementById(elId);
+      if (!items.length) { el.innerHTML = '<p class="cv-empty">' + empty + '</p>'; return; }
+      items.forEach(function (it) {
+        var row = document.createElement("div"); row.className = "cv-entry";
+        row.innerHTML =
+          '<div><div class="cv-main">' + it.main + '</div><div class="cv-sub">' + it.sub + '</div></div>' +
+          '<div class="cv-when">' + it.when + '</div>';
+        el.appendChild(row);
+      });
+    }
+    fillList("cv-education", SITE_DATA.cv.education, "No education entries yet.");
+    fillList("cv-experience", SITE_DATA.cv.experience, "No experience entries yet.");
+    fillList("cv-projects", SITE_DATA.cv.projects, "No projects listed yet.");
+    fillList("cv-awards", SITE_DATA.cv.awards, "No awards yet.");
+
+    var authored = SITE_DATA.papers.filter(function (p) { return p.authored; });
+    fillList("cv-publications", authored.map(function (p) {
+      return { main: p.title, sub: p.authors + " — " + p.venue, when: String(p.year) };
+    }), "No publications yet — mark a paper as authored by you in the archive and it appears here automatically.");
+
+    function fillChips(elId, items) {
+      var el = document.getElementById(elId);
+      items.forEach(function (s) {
+        var c = document.createElement("span"); c.className = "chip"; c.textContent = s;
+        el.appendChild(c);
+      });
+    }
+    fillChips("cv-skills", SITE_DATA.cv.skills);
+    fillChips("cv-certs", SITE_DATA.cv.certs);
+    fillChips("cv-languages", SITE_DATA.cv.languages);
+  })();
+  document.getElementById("cv-print").addEventListener("click", function () { window.print(); });
+
+  // ---------- init ----------
+  go((location.hash.replace("#/", "")) || "profile");
+})();
+</script>
