@@ -609,6 +609,7 @@
       {
         id: "attention-2017",
         title: "Attention Is All You Need",
+        short: "Attention",
         authors: "A. Vaswani, N. Shazeer, N. Parmar, et al.",
         year: 2017,
         venue: "NeurIPS",
@@ -620,6 +621,7 @@
       {
         id: "transformer-circuits-2021",
         title: "A Mathematical Framework for Transformer Circuits",
+        short: "Transformer Circuits",
         authors: "N. Elhage, N. Nanda, C. Olah, et al.",
         year: 2021,
         venue: "Transformer Circuits Thread (Anthropic)",
@@ -631,6 +633,7 @@
       {
         id: "induction-heads-2022",
         title: "In-context Learning and Induction Heads",
+        short: "Induction Heads",
         authors: "C. Olsson, N. Elhage, N. Nanda, et al.",
         year: 2022,
         venue: "Transformer Circuits Thread (Anthropic)",
@@ -642,6 +645,7 @@
       {
         id: "grokking-2023",
         title: "Progress Measures for Grokking via Mechanistic Interpretability",
+        short: "Grokking",
         authors: "N. Nanda, L. Chan, T. Lieberum, J. Smith, J. Steinhardt",
         year: 2023,
         venue: "ICLR",
@@ -653,6 +657,7 @@
       {
         id: "sae-interpretable-2023",
         title: "Sparse Autoencoders Find Highly Interpretable Features in Language Models",
+        short: "SAE Features",
         authors: "H. Cunningham, A. Ewart, L. Riggs, R. Huben, L. Sharkey",
         year: 2023,
         venue: "arXiv",
@@ -664,6 +669,7 @@
       {
         id: "monosemanticity-2023",
         title: "Towards Monosemanticity: Decomposing Language Models With Dictionary Learning",
+        short: "Monosemanticity",
         authors: "T. Bricken, A. Templeton, J. Batson, et al.",
         year: 2023,
         venue: "Transformer Circuits Thread (Anthropic)",
@@ -675,6 +681,7 @@
       {
         id: "scaling-mono-2024",
         title: "Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet",
+        short: "Scaling Monosemanticity",
         authors: "A. Templeton, T. Conerly, J. Marcus, et al.",
         year: 2024,
         venue: "Transformer Circuits Thread (Anthropic)",
@@ -686,6 +693,7 @@
       {
         id: "actadd-2023",
         title: "Activation Addition: Steering Language Models Without Optimization",
+        short: "Activation Addition",
         authors: "A. Turner, L. Thiergart, G. Leech, et al.",
         year: 2023,
         venue: "arXiv",
@@ -697,6 +705,7 @@
       {
         id: "repe-2023",
         title: "Representation Engineering: A Top-Down Approach to AI Transparency",
+        short: "Rep. Engineering",
         authors: "A. Zou, L. Phan, S. Chen, et al.",
         year: 2023,
         venue: "arXiv",
@@ -708,6 +717,7 @@
       {
         id: "steering-distillation-2026",
         title: "Subliminal Learning Is Steering Vector Distillation",
+        short: "Steering Distillation",
         authors: "C. Blank, A. Bhatia, S. Rajamanoharan, A. Conmy, N. Nanda",
         year: 2026,
         venue: "arXiv",
@@ -719,6 +729,7 @@
       {
         id: "intrinsic-dim-2020",
         title: "Intrinsic Dimensionality Explains the Effectiveness of Language Model Fine-Tuning",
+        short: "Intrinsic Dimensionality",
         authors: "A. Aghajanyan, L. Zettlemoyer, S. Gupta",
         year: 2020,
         venue: "arXiv",
@@ -730,6 +741,7 @@
       {
         id: "task-arithmetic-2022",
         title: "Editing Models with Task Arithmetic",
+        short: "Task Arithmetic",
         authors: "G. Ilharco, M. T. Ribeiro, M. Wortsman, et al.",
         year: 2022,
         venue: "arXiv",
@@ -741,6 +753,7 @@
       {
         id: "rome-2022",
         title: "Locating and Editing Factual Associations in GPT (ROME)",
+        short: "ROME",
         authors: "K. Meng, D. Bau, A. Andonian, Y. Belinkov",
         year: 2022,
         venue: "NeurIPS",
@@ -752,6 +765,7 @@
       {
         id: "memit-2022",
         title: "Mass-Editing Memory in a Transformer (MEMIT)",
+        short: "MEMIT",
         authors: "K. Meng, A. Sharma, A. Andonian, Y. Belinkov, D. Bau",
         year: 2022,
         venue: "ICLR",
@@ -763,6 +777,7 @@
       {
         id: "constitutional-ai-2022",
         title: "Constitutional AI: Harmlessness from AI Feedback",
+        short: "Constitutional AI",
         authors: "Y. Bai, S. Kadavath, S. Kundu, et al.",
         year: 2022,
         venue: "arXiv",
@@ -774,6 +789,7 @@
       {
         id: "bereska-review-2024",
         title: "Mechanistic Interpretability for AI Safety: A Review",
+        short: "Interp. for Safety (Review)",
         authors: "L. Bereska, E. Gavves",
         year: 2024,
         venue: "arXiv",
@@ -955,6 +971,9 @@
     var nodeGroup = zoomLayer.append("g").selectAll("g")
       .data(nodes).enter().append("g").style("cursor", "pointer");
 
+    nodeGroup.append("title")
+      .text(function (d) { return d.data.title + " — " + d.data.authors.split(",")[0].split(" ").pop() + " et al., " + d.data.year; });
+
     nodeGroup.append("circle")
       .attr("class", "node-circle")
       .attr("r", function (d) { return d.r; })
@@ -964,7 +983,7 @@
       .attr("class", "node-label")
       .attr("text-anchor", "middle")
       .attr("dy", function (d) { return d.r + 13; })
-      .text(function (d) { return d.data.authors.split(",")[0].split(" ").pop() + " " + d.data.year; });
+      .text(function (d) { return d.data.short || d.data.title; });
 
     nodeGroup.on("click", function (ev, d) { openPanel(d.data); });
 
