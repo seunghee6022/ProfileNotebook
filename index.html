@@ -471,10 +471,6 @@
           <h3>Languages</h3>
           <div class="skill-row" id="cv-languages"></div>
         </div>
-        <div class="cv-section">
-          <h3>Awards &amp; Fellowships</h3>
-          <div id="cv-awards"></div>
-        </div>
       </div>
     </section>
 
@@ -895,9 +891,8 @@
         { main: "Tabular Data Augmentation with LLMs", sub: "Kumoh National Institute of Technology — fine-tuned LLM for distribution-aware augmentation with self-evaluation loops.", when: "Apr 2025 – present" }
       ],
       skills: ["Python", "PyTorch", "Pandas", "Git", "React", "Vue.js", "Django", "MySQL", "Weaviate (Vector DB)", "AWS SageMaker", "Azure DevOps", "TensorFlow", "NetworkX"],
-      certs: ["IBM WatsonX Governance Certificate", "Oracle Cloud Infrastructure 2024 Foundations Associate", "AWS Certification (in progress)"],
-      languages: ["Korean — Native", "English — C1", "German — B1"],
-      awards: []
+      certs: ["Databricks GenAI Engineering Associate", "IBM WatsonX Governance Certificate", "Oracle Cloud Infrastructure 2024 Foundations Associate", "AWS Certification (in progress)"],
+      languages: ["Korean — Native", "English — C1", "German — B1"]
     }
   };
 
@@ -1269,7 +1264,6 @@
     fillList("cv-education", SITE_DATA.cv.education, "No education entries yet.");
     fillList("cv-experience", SITE_DATA.cv.experience, "No experience entries yet.");
     fillList("cv-projects", SITE_DATA.cv.projects, "No projects listed yet.");
-    fillList("cv-awards", SITE_DATA.cv.awards, "No awards yet.");
 
     var authored = SITE_DATA.papers.filter(function (p) { return p.authored; });
     fillList("cv-publications", authored.map(function (p) {
