@@ -292,8 +292,14 @@
     padding: 12px 4px; border-bottom: 1px solid var(--line);
   }
   .progress-row:last-child { border-bottom: none; }
-  .progress-row .pr-title { font-size: 0.96rem; }
-  .progress-row .pr-meta { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--ink-faint); margin-top: 2px; }
+  .progress-row .pr-title { font-size: 0.96rem; color: var(--ink); text-decoration: none; font-weight: 500; }
+  .progress-row .pr-title:hover { color: var(--accent); text-decoration: underline; }
+  .progress-row .pr-meta { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--ink-faint); margin-top: 3px; }
+  .pr-review-btn {
+    background: none; border: none; color: var(--accent); font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem; cursor: pointer; padding: 0; margin-left: 10px;
+  }
+  .pr-review-btn:hover { text-decoration: underline; }
   .status-pill {
     font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; padding: 6px 14px; border-radius: 999px;
     border: 1px solid var(--line-strong); background: var(--paper); color: var(--ink-soft);
@@ -1155,7 +1161,11 @@
         var row = document.createElement("div");
         row.className = "progress-row";
         row.innerHTML =
-          '<div><div class="pr-title">' + p.title + '</div><div class="pr-meta">' + p.authors.split(",")[0].split(" ").pop() + " et al., " + p.year + '</div></div>' +
+          '<div>' +
+          '<a class="pr-title" href="' + p.source + '" target="_blank" rel="noopener">' + p.title + '</a>' +
+          '<div class="pr-meta">' + p.authors.split(",")[0].split(" ").pop() + " et al., " + p.year +
+          ' <button class="pr-review-btn" data-review-id="' + p.id + '">Review →</button></div>' +
+          '</div>' +
           '<button class="status-pill" data-id="' + p.id + '" data-state="' + state + '">' + PROGRESS_LABEL[state] + '</button>';
         section.appendChild(row);
       });
@@ -1172,8 +1182,18 @@
         renderProgress();
       });
     });
+    groupsEl.querySelectorAll(".pr-review-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () { openPaperReview(btn.dataset.reviewId); });
+    });
   }
   renderProgress();
+
+  function openPaperReview(id) {
+    var p = SITE_DATA.papers.filter(function (x) { return x.id === id; })[0];
+    if (!p) return;
+    go("papers");
+    openPanel(p);
+  }
 
   // ---------- cv ----------
   (function renderCV() {
