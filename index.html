@@ -287,11 +287,12 @@
   }
   .progress-group-head h3 { margin: 0; font-size: 1.05rem; }
   .progress-group-head .pg-count { font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--ink-faint); }
+  .progress-item { border-bottom: 1px solid var(--line); }
+  .progress-item:last-child { border-bottom: none; }
   .progress-row {
     display: flex; align-items: center; justify-content: space-between; gap: 14px;
-    padding: 12px 4px; border-bottom: 1px solid var(--line);
+    padding: 12px 4px;
   }
-  .progress-row:last-child { border-bottom: none; }
   .progress-row .pr-title { font-size: 0.96rem; color: var(--ink); text-decoration: none; font-weight: 500; }
   .progress-row .pr-title:hover { color: var(--accent); text-decoration: underline; }
   .progress-row .pr-meta { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--ink-faint); margin-top: 3px; }
@@ -300,6 +301,22 @@
     font-size: 0.75rem; cursor: pointer; padding: 0; margin-left: 10px;
   }
   .pr-review-btn:hover { text-decoration: underline; }
+  .pr-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .note-toggle {
+    background: none; border: 1px solid var(--line-strong); border-radius: 999px; padding: 6px 12px;
+    font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--ink-soft); cursor: pointer;
+    white-space: nowrap;
+  }
+  .note-toggle:hover { border-color: var(--accent); color: var(--accent); }
+  .note-toggle.has-note { border-color: var(--accent-warm); color: var(--accent-warm); background: var(--accent-warm-soft); }
+  .note-box { padding: 0 4px 16px; }
+  .note-textarea {
+    width: 100%; min-height: 76px; resize: vertical; background: var(--paper); border: 1px solid var(--line);
+    border-radius: 8px; padding: 10px 12px; font-family: "Source Serif 4", serif; font-size: 0.92rem;
+    color: var(--ink); line-height: 1.5;
+  }
+  .note-textarea:focus { border-color: var(--accent); outline: none; }
+  .note-textarea::placeholder { color: var(--ink-faint); }
   .status-pill {
     font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; padding: 6px 14px; border-radius: 999px;
     border: 1px solid var(--line-strong); background: var(--paper); color: var(--ink-soft);
@@ -409,7 +426,7 @@
     <section class="view" id="view-progress">
       <p class="eyebrow">Reading Plan</p>
       <h1 style="margin:0 0 8px;">Progress</h1>
-      <p class="tagline" style="margin-bottom:4px;">Working through the archive one paper at a time. Click a status pill to advance it — To Read → Reading → Done.</p>
+      <p class="tagline" style="margin-bottom:4px;">Working through the archive one paper at a time. Click a status pill to advance it — To Read → Reading → Done — and use + Note for open questions or things to revisit.</p>
       <p class="placeholder-note" style="margin-bottom:28px;">Saved to this browser only (no account, no server) — it won't follow you to another device or browser, and other visitors see their own, separate progress.</p>
       <div class="progress-summary" id="progress-summary"></div>
       <div id="progress-groups"></div>
@@ -1120,18 +1137,28 @@
   function loadProgress() {
     try {
       var raw = localStorage.getItem(PROGRESS_KEY);
-      return raw ? JSON.parse(raw) : {};
+      var map = raw ? JSON.parse(raw) : {};
+      Object.keys(map).forEach(function (id) {
+        if (typeof map[id] === "string") map[id] = { state: map[id], note: "" };
+      });
+      return map;
     } catch (e) { return {}; }
   }
   function saveProgress(map) {
     try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(map)); } catch (e) {}
   }
+  function getEntry(id) {
+    return progressMap[id] || { state: "todo", note: "" };
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
   var progressMap = loadProgress();
 
   function renderProgress() {
     var papers = SITE_DATA.papers;
-    var done = papers.filter(function (p) { return progressMap[p.id] === "done"; }).length;
-    var reading = papers.filter(function (p) { return progressMap[p.id] === "reading"; }).length;
+    var done = papers.filter(function (p) { return getEntry(p.id).state === "done"; }).length;
+    var reading = papers.filter(function (p) { return getEntry(p.id).state === "reading"; }).length;
     var total = papers.length;
 
     var summaryEl = document.getElementById("progress-summary");
@@ -1149,7 +1176,7 @@
     Object.keys(CATEGORY).forEach(function (key) {
       var group = papers.filter(function (p) { return p.tag === key; });
       if (!group.length) return;
-      var groupDone = group.filter(function (p) { return progressMap[p.id] === "done"; }).length;
+      var groupDone = group.filter(function (p) { return getEntry(p.id).state === "done"; }).length;
       var section = document.createElement("div");
       section.className = "progress-group";
       var head = document.createElement("div");
@@ -1157,17 +1184,24 @@
       head.innerHTML = "<h3>" + CATEGORY[key].label + "</h3><span class=\"pg-count\">" + groupDone + " / " + group.length + "</span>";
       section.appendChild(head);
       group.forEach(function (p) {
-        var state = progressMap[p.id] || "todo";
-        var row = document.createElement("div");
-        row.className = "progress-row";
-        row.innerHTML =
+        var entry = getEntry(p.id);
+        var hasNote = entry.note && entry.note.trim().length > 0;
+        var item = document.createElement("div");
+        item.className = "progress-item";
+        item.innerHTML =
+          '<div class="progress-row">' +
           '<div>' +
           '<a class="pr-title" href="' + p.source + '" target="_blank" rel="noopener">' + p.title + '</a>' +
           '<div class="pr-meta">' + p.authors.split(",")[0].split(" ").pop() + " et al., " + p.year +
           ' <button class="pr-review-btn" data-review-id="' + p.id + '">Review →</button></div>' +
           '</div>' +
-          '<button class="status-pill" data-id="' + p.id + '" data-state="' + state + '">' + PROGRESS_LABEL[state] + '</button>';
-        section.appendChild(row);
+          '<div class="pr-actions">' +
+          '<button class="note-toggle' + (hasNote ? ' has-note' : '') + '" data-note-toggle="' + p.id + '">' + (hasNote ? "Note ✓" : "+ Note") + '</button>' +
+          '<button class="status-pill" data-id="' + p.id + '" data-state="' + entry.state + '">' + PROGRESS_LABEL[entry.state] + '</button>' +
+          '</div>' +
+          '</div>' +
+          '<div class="note-box" hidden><textarea class="note-textarea" data-note-input="' + p.id + '" placeholder="Notes, open questions, things to revisit…">' + escapeHtml(entry.note || "") + '</textarea></div>';
+        section.appendChild(item);
       });
       groupsEl.appendChild(section);
     });
@@ -1175,15 +1209,35 @@
     groupsEl.querySelectorAll(".status-pill").forEach(function (btn) {
       btn.addEventListener("click", function () {
         var id = btn.dataset.id;
-        var current = progressMap[id] || "todo";
-        var next = PROGRESS_STATES[(PROGRESS_STATES.indexOf(current) + 1) % PROGRESS_STATES.length];
-        progressMap[id] = next;
+        var entry = getEntry(id);
+        entry.state = PROGRESS_STATES[(PROGRESS_STATES.indexOf(entry.state) + 1) % PROGRESS_STATES.length];
+        progressMap[id] = entry;
         saveProgress(progressMap);
         renderProgress();
       });
     });
     groupsEl.querySelectorAll(".pr-review-btn").forEach(function (btn) {
       btn.addEventListener("click", function () { openPaperReview(btn.dataset.reviewId); });
+    });
+    groupsEl.querySelectorAll(".note-toggle").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var box = btn.closest(".progress-item").querySelector(".note-box");
+        box.hidden = !box.hidden;
+        if (!box.hidden) box.querySelector("textarea").focus();
+      });
+    });
+    groupsEl.querySelectorAll(".note-textarea").forEach(function (ta) {
+      ta.addEventListener("input", function () {
+        var id = ta.dataset.noteInput;
+        var entry = getEntry(id);
+        entry.note = ta.value;
+        progressMap[id] = entry;
+        saveProgress(progressMap);
+        var toggle = ta.closest(".progress-item").querySelector(".note-toggle");
+        var hasNote = ta.value.trim().length > 0;
+        toggle.classList.toggle("has-note", hasNote);
+        toggle.textContent = hasNote ? "Note ✓" : "+ Note";
+      });
     });
   }
   renderProgress();
