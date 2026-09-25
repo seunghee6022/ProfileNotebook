@@ -263,6 +263,47 @@
   .panel .p-review { font-size: 0.92rem; line-height: 1.65; color: var(--ink); }
   .panel .p-tags { display: flex; gap: 6px; flex-wrap: wrap; }
 
+  /* ---- progress ---- */
+  .progress-summary {
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+    background: var(--paper-raised); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px 22px; margin-bottom: 30px;
+  }
+  .progress-summary .ps-count { font-family: "Fraunces", serif; font-size: 1.9rem; font-weight: 600; white-space: nowrap; }
+  .progress-summary .ps-count span { color: var(--ink-faint); font-size: 1.05rem; font-family: "IBM Plex Mono", monospace; }
+  .progress-track {
+    flex: 1 1 220px; height: 10px; border-radius: 999px; background: var(--line);
+    overflow: hidden; display: flex; min-width: 160px;
+  }
+  .progress-track .pt-done { background: var(--good); height: 100%; }
+  .progress-track .pt-reading { background: var(--accent-warm); height: 100%; }
+  .progress-summary .ps-legend { display: flex; gap: 14px; font-size: 0.8rem; color: var(--ink-soft); flex-wrap: wrap; }
+  .progress-summary .ps-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .progress-summary .ps-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .progress-group { margin-bottom: 30px; }
+  .progress-group-head {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+    margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line);
+  }
+  .progress-group-head h3 { margin: 0; font-size: 1.05rem; }
+  .progress-group-head .pg-count { font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--ink-faint); }
+  .progress-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    padding: 12px 4px; border-bottom: 1px solid var(--line);
+  }
+  .progress-row:last-child { border-bottom: none; }
+  .progress-row .pr-title { font-size: 0.96rem; }
+  .progress-row .pr-meta { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; color: var(--ink-faint); margin-top: 2px; }
+  .status-pill {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; padding: 6px 14px; border-radius: 999px;
+    border: 1px solid var(--line-strong); background: var(--paper); color: var(--ink-soft);
+    cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: transform .1s ease;
+  }
+  .status-pill:hover { transform: translateY(-1px); }
+  .status-pill:active { transform: translateY(0); }
+  .status-pill[data-state="reading"] { background: var(--accent-warm-soft); border-color: var(--accent-warm); color: var(--accent-warm); }
+  .status-pill[data-state="done"] { background: var(--accent-soft); border-color: var(--good); color: var(--good); }
+
   /* ---- cv ---- */
   .cv-sheet { max-width: 74ch; background: var(--paper-raised); border: 1px solid var(--line); border-radius: var(--radius); padding: 44px 48px; box-shadow: var(--shadow); }
   .cv-head { display: flex; gap: 20px; align-items: center; margin-bottom: 28px; border-bottom: 2px solid var(--ink); padding-bottom: 20px; }
@@ -300,6 +341,7 @@
     <button class="tab-btn" data-route="profile">Profile</button>
     <button class="tab-btn" data-route="blog">Math Blog</button>
     <button class="tab-btn" data-route="papers">Papers</button>
+    <button class="tab-btn" data-route="progress">Progress</button>
     <button class="tab-btn" data-route="cv">CV</button>
   </div>
 </nav>
@@ -356,6 +398,15 @@
           <div id="panel-body"></div>
         </aside>
       </div>
+    </section>
+
+    <section class="view" id="view-progress">
+      <p class="eyebrow">Reading Plan</p>
+      <h1 style="margin:0 0 8px;">Progress</h1>
+      <p class="tagline" style="margin-bottom:4px;">Working through the archive one paper at a time. Click a status pill to advance it — To Read → Reading → Done.</p>
+      <p class="placeholder-note" style="margin-bottom:28px;">Saved to this browser only (no account, no server) — it won't follow you to another device or browser, and other visitors see their own, separate progress.</p>
+      <div class="progress-summary" id="progress-summary"></div>
+      <div id="progress-groups"></div>
     </section>
 
     <section class="view" id="view-cv">
@@ -800,6 +851,7 @@
 
     cv: {
       contact: "linkedin.com/in/seunghee-jeong",
+      notebookUrl: "https://seunghee6022.github.io/ProfileNotebook/",
       education: [
         { main: "Elite M.Sc. Data Science", sub: "Ludwig-Maximilians-Universität München (LMU) — ML, unsupervised learning, NLP, deep learning, statistical modeling. GPA 2.3 (Good)", when: "Oct 2020 – Jan 2024" },
         { main: "B.Sc. Industrial Management Engineering", sub: "Kumoh National Institute of Technology — data mining, databases, algorithms, operations research. GPA 4.07/4.5 (94.7%)", when: "Mar 2015 – Aug 2019" }
@@ -837,7 +889,7 @@
   };
 
   // ---------- routing ----------
-  var routes = ["profile", "blog", "papers", "cv"];
+  var routes = ["profile", "blog", "papers", "progress", "cv"];
   function go(route) {
     if (routes.indexOf(route) === -1) route = "profile";
     document.querySelectorAll(".view").forEach(function (v) { v.classList.remove("active"); });
@@ -1054,9 +1106,80 @@
     document.getElementById("paper-panel").classList.remove("open");
   });
 
+  // ---------- progress ----------
+  var PROGRESS_KEY = "phd-notebook-progress-v1";
+  var PROGRESS_STATES = ["todo", "reading", "done"];
+  var PROGRESS_LABEL = { todo: "To Read", reading: "Reading", done: "Done" };
+
+  function loadProgress() {
+    try {
+      var raw = localStorage.getItem(PROGRESS_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+  function saveProgress(map) {
+    try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(map)); } catch (e) {}
+  }
+  var progressMap = loadProgress();
+
+  function renderProgress() {
+    var papers = SITE_DATA.papers;
+    var done = papers.filter(function (p) { return progressMap[p.id] === "done"; }).length;
+    var reading = papers.filter(function (p) { return progressMap[p.id] === "reading"; }).length;
+    var total = papers.length;
+
+    var summaryEl = document.getElementById("progress-summary");
+    summaryEl.innerHTML =
+      '<div class="ps-count">' + done + '<span> / ' + total + ' read</span></div>' +
+      '<div class="progress-track"><span class="pt-done" style="width:' + (done / total * 100) + '%"></span><span class="pt-reading" style="width:' + (reading / total * 100) + '%"></span></div>' +
+      '<div class="ps-legend">' +
+      '<span><span class="ps-dot" style="background:var(--good)"></span>Done (' + done + ')</span>' +
+      '<span><span class="ps-dot" style="background:var(--accent-warm)"></span>Reading (' + reading + ')</span>' +
+      '<span><span class="ps-dot" style="background:var(--line-strong)"></span>To read (' + (total - done - reading) + ')</span>' +
+      '</div>';
+
+    var groupsEl = document.getElementById("progress-groups");
+    groupsEl.innerHTML = "";
+    Object.keys(CATEGORY).forEach(function (key) {
+      var group = papers.filter(function (p) { return p.tag === key; });
+      if (!group.length) return;
+      var groupDone = group.filter(function (p) { return progressMap[p.id] === "done"; }).length;
+      var section = document.createElement("div");
+      section.className = "progress-group";
+      var head = document.createElement("div");
+      head.className = "progress-group-head";
+      head.innerHTML = "<h3>" + CATEGORY[key].label + "</h3><span class=\"pg-count\">" + groupDone + " / " + group.length + "</span>";
+      section.appendChild(head);
+      group.forEach(function (p) {
+        var state = progressMap[p.id] || "todo";
+        var row = document.createElement("div");
+        row.className = "progress-row";
+        row.innerHTML =
+          '<div><div class="pr-title">' + p.title + '</div><div class="pr-meta">' + p.authors.split(",")[0].split(" ").pop() + " et al., " + p.year + '</div></div>' +
+          '<button class="status-pill" data-id="' + p.id + '" data-state="' + state + '">' + PROGRESS_LABEL[state] + '</button>';
+        section.appendChild(row);
+      });
+      groupsEl.appendChild(section);
+    });
+
+    groupsEl.querySelectorAll(".status-pill").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var id = btn.dataset.id;
+        var current = progressMap[id] || "todo";
+        var next = PROGRESS_STATES[(PROGRESS_STATES.indexOf(current) + 1) % PROGRESS_STATES.length];
+        progressMap[id] = next;
+        saveProgress(progressMap);
+        renderProgress();
+      });
+    });
+  }
+  renderProgress();
+
   // ---------- cv ----------
   (function renderCV() {
-    document.getElementById("cv-contact").textContent = SITE_DATA.cv.contact;
+    document.getElementById("cv-contact").innerHTML =
+      SITE_DATA.cv.contact + ' · <a href="' + SITE_DATA.cv.notebookUrl + '" target="_blank" rel="noopener">' +
+      SITE_DATA.cv.notebookUrl.replace(/^https?:\/\//, "").replace(/\/$/, "") + '</a>';
 
     function fillList(elId, items, empty) {
       var el = document.getElementById(elId);
